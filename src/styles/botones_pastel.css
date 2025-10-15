@@ -1,0 +1,70 @@
+/* Botón pastel principal */
+.btn-primary {
+  background: #7eb6e6;
+  color: #fff;
+  border: 2px solid #7eb6e6;
+  border-radius: 6px;
+  font-weight: 700;
+  padding: 10px 18px;
+  margin: 4px 0;
+  font-size: 16px;
+  transition: background 0.25s, color 0.25s;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  background: #fff;
+  color: #7eb6e6;
+}
+
+/* Botón pastel secundario */
+.btn-secondary {
+  background: #fdf6f0;
+  color: #7eb6e6;
+  border: 2px solid #7eb6e6;
+  border-radius: 6px;
+  font-weight: 700;
+  padding: 10px 18px;
+  margin: 4px 0;
+  font-size: 16px;
+  transition: background 0.25s, color 0.25s;
+  cursor: pointer;
+}
+.btn-secondary:hover {
+  background: #7eb6e6;
+  color: #fff;
+}
+
+/* Botón peligro */
+.btn-danger {
+  background: #e58a2e;
+  color: #fff;
+  border: 2px solid #e58a2e;
+  border-radius: 6px;
+  font-weight: 700;
+  padding: 10px 18px;
+  margin: 4px 0;
+  font-size: 16px;
+  transition: background 0.25s, color 0.25s;
+  cursor: pointer;
+}
+.btn-danger:hover {
+  background: #fff;
+  color: #e58a2e;
+}
+
+/* Inputs pastel */
+.input-pastel {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1.5px solid #b3c6e7;
+  background: #f7fbff;
+  color: #2d3a4a;
+  font-size: 15px;
+  margin-bottom: 6px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.input-pastel:focus {
+  outline: 2px solid #7eb6e6;
+  background: #fff;
+}

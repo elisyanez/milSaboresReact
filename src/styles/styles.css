@@ -1,0 +1,80 @@
+/* Import Google Font */
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Noto+Sans+Symbols:wght@100..900&family=Pacifico&display=swap');
+
+:root {
+  --tabla-naranja: #E58A2E;
+  --tabla-texto: #5D4037;
+  --tabla-fondo: #FFF5E1;
+  --tabla-acento: #FFC0CB;
+  --tabla-radius: 6px;
+  --tabla-border: 2px;
+  --tabla-padding: 12px 16px;
+  --tabla-font: "Lato", system-ui, -apple-system;
+  /* head-font should only contain the font-family and fallbacks */
+  --head-font: 'Pacifico', cursive;
+}
+.brand-wrap { display:flex; align-items:flex-start; }
+.brand-logo { height: 56px; width: auto; display:block; }
+
+.nav-links{ display:flex; gap:12px; align-items:center; margin-left:auto; }
+/* Topbar (header) */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--tabla-texto); /* <-- header background using the requested variable */
+  border-bottom: 2px solid rgba(0,0,0,0.08);
+}
+.topbar-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 12px;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Style for nav links: default (on dark header) show as light text */
+.nav-links a {
+  color: #fff;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: transparent;
+}
+
+.nav-links a.active {
+  background: var(--tabla-fondo); /* light background for the active item */
+  color: var(--tabla-texto);
+  font-weight: 700;
+}
+
+.home-logo{ height: 350px; width: auto; display:block; }
+
+body {
+  font-family: var(--tabla-font);
+  background-color: var(--tabla-fondo);
+}
+
+/* Cart styles */
+.cart-wrap { margin-left: 12px; }
+.cart-link { display: inline-flex; align-items: center; gap: 8px; color: #fff; text-decoration: none; padding: 6px 8px; }
+.cart-link .cart-icon { width: 20px; height: 20px; color: #fff; }
+.cart-link .cart-text { color: #fff; font-weight: 600; }
+.topbar .cart-link { transition: background 0.15s ease; }
+.topbar .cart-link:hover { background: rgba(255,255,255,0.06); border-radius: 6px; }
+
+@media (max-width:720px){
+  .cart-text { display:none; }
+}
+
+/* Apply the heading font to headings and brand elements */
+h1,h2,h3,.brand {
+  font-family: var(--head-font);
+  font-weight: 400;
+  /* Pacifico is a display script - usually used at normal weight */
+  line-height: 1.15;
+}
