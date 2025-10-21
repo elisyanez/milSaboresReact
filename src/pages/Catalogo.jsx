@@ -1,9 +1,9 @@
 import React from 'react';
 
 const productos = [
-  { codigo: 'TC001', categoria: 'Tortas Cuadradas', nombre: 'Torta Cuadrada de Chocolate', precio: '$45.000 CLP', img: '/IMG/torta-chocolate.png' },
-  { codigo: 'TC002', categoria: 'Tortas Cuadradas', nombre: 'Torta Cuadrada de Frutas', precio: '$50.000 CLP', img: '/IMG/torta-frutas.png' },
-  { codigo: 'TT001', categoria: 'Tortas Circulares', nombre: 'Torta Circular de Vainilla', precio: '$40.000 CLP', img: '/IMG/torta-vainilla.png' },
+  { codigo: 'TC001', categoria: 'Tortas Cuadradas', nombre: 'Torta Cuadrada de Chocolate', precio: '$45.000 CLP', img: '/IMG/torta-chocolate.jpg' },
+  { codigo: 'TC002', categoria: 'Tortas Cuadradas', nombre: 'Torta Cuadrada de Frutas', precio: '$50.000 CLP', img: '/IMG/torta-frutas.jpg' },
+  { codigo: 'TT001', categoria: 'Tortas Circulares', nombre: 'Torta Circular de Vainilla', precio: '$40.000 CLP', img: '/IMG/torta-vainilla.jpg' },
   { codigo: 'TT002', categoria: 'Tortas Circulares', nombre: 'Torta Circular de Manjar', precio: '$42.000 CLP', img: '/IMG/torta-manjar.png' },
   { codigo: 'PI001', categoria: 'Postres Individuales', nombre: 'Mousse de Chocolate', precio: '$5.000 CLP', img: '/IMG/mousse-chocolate.png' },
   { codigo: 'PI002', categoria: 'Postres Individuales', nombre: 'Tiramisú Clásico', precio: '$5.500 CLP', img: '/IMG/tiramisu.png' },
