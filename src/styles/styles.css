@@ -41,15 +41,31 @@
 .nav-links a {
   color: #fff;
   text-decoration: none;
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
   background: transparent;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+  border: 2px solid transparent;
+}
+
+.nav-links a:hover {
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
 }
 
 .nav-links a.active {
-  background: var(--tabla-fondo); /* light background for the active item */
+  background: var(--tabla-fondo);
   color: var(--tabla-texto);
   font-weight: 700;
+  border-color: var(--tabla-acento);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nav-links a.active:hover {
+  background: white;
+  transform: translateY(-1px);
 }
 
 .home-logo{ height: 350px; width: auto; display:block; }
@@ -65,12 +81,48 @@ body {
 }
 
 /* Cart styles */
-.cart-wrap { margin-left: 12px; }
-.cart-link { display: inline-flex; align-items: center; gap: 8px; color: #fff; text-decoration: none; padding: 6px 8px; }
-.cart-link .cart-icon { width: 20px; height: 20px; color: #fff; }
-.cart-link .cart-text { color: #fff; font-weight: 600; }
-.topbar .cart-link { transition: background 0.15s ease; }
-.topbar .cart-link:hover { background: rgba(255,255,255,0.06); border-radius: 6px; }
+.cart-wrap { 
+  margin-left: 12px;
+}
+
+.cart-link { 
+  display: inline-flex; 
+  align-items: center; 
+  gap: 8px; 
+  color: #fff; 
+  text-decoration: none; 
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid transparent;
+}
+
+.cart-link .cart-icon { 
+  width: 20px; 
+  height: 20px; 
+  color: #fff;
+  transition: transform 0.3s ease;
+}
+
+.cart-link .cart-text { 
+  color: #fff; 
+  font-weight: 600;
+}
+
+.topbar .cart-link { 
+  transition: all 0.3s ease; 
+}
+
+.topbar .cart-link:hover { 
+  background: rgba(255,255,255,0.15); 
+  border-radius: 8px;
+  transform: translateY(-1px);
+}
+
+.topbar .cart-link:hover .cart-icon {
+  transform: scale(1.1);
+}
 
 @media (max-width:720px){
   .cart-text { display:none; }
