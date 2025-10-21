@@ -45,22 +45,40 @@ export default function Home() {
         <section className="container actions">
           <h2>¿Qué deseas hacer hoy?</h2>
           <div className="action-grid">
-            <NavLink to="/usuario" className="btn-primary">
+            <NavLink 
+              to="/usuario" 
+              className={({ isActive }) => isActive ? "btn-primary active" : "btn-primary"}
+            >
               Gestión de Usuario
             </NavLink>
-            <NavLink to="/catalogo" className="btn-primary">
+            <NavLink 
+              to="/catalogo" 
+              className={({ isActive }) => isActive ? "btn-primary active" : "btn-primary"}
+            >
               Catálogo de productos
             </NavLink>
-            <NavLink to="/pedido" className="btn-primary">
+            <NavLink 
+              to="/pedido" 
+              className={({ isActive }) => isActive ? "btn-primary active" : "btn-primary"}
+            >
               Tu Pedido
             </NavLink>
-            <NavLink to="/blogs" className="btn-primary">
+            <NavLink 
+              to="/blogs" 
+              className={({ isActive }) => isActive ? "btn-primary active" : "btn-primary"}
+            >
               Noticias
             </NavLink>
-            <NavLink to="/beneficios" className="btn-primary">
+            <NavLink 
+              to="/beneficios" 
+              className={({ isActive }) => isActive ? "btn-primary active" : "btn-primary"}
+            >
               Promociones
             </NavLink>
-            <NavLink to="/consejos" className="btn-primary">
+            <NavLink 
+              to="/consejos" 
+              className={({ isActive }) => isActive ? "btn-primary active" : "btn-primary"}
+            >
               Consejos
             </NavLink>
           </div>

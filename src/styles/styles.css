@@ -78,6 +78,7 @@ body {
 
 /* Apply the heading font to headings and brand elements */
 h1,h2,h3,.brand {
+  color: #5D4037;
   font-family: var(--head-font);
   font-weight: 400;
   /* Pacifico is a display script - usually used at normal weight */
@@ -174,9 +175,34 @@ h1,h2,h3,.brand {
   padding: 14px 12px;
   border-radius: 10px;
   font-size: 15px;
-  box-shadow: 0 6px 0 rgba(126,182,230,0.08);
+  box-shadow: 0 6px 0 rgba(229,138,46,0.15);
   text-decoration: none;
   text-align: center;
+  background-color: var(--tabla-naranja);
+  border-color: var(--tabla-naranja);
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.action-grid .btn-primary:hover {
+  background-color: #f4982f;
+  border-color: #f4982f;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(229,138,46,0.2);
+}
+
+/* Estilo para botón activo */
+.action-grid .btn-primary.active {
+  background-color: #fff;
+  color: var(--tabla-naranja);
+  border: 2px solid var(--tabla-naranja);
+  box-shadow: 0 4px 12px rgba(229,138,46,0.15);
+  position: relative;
+}
+
+.action-grid .btn-primary.active:hover {
+  background-color: #fff8f3;
+  transform: translateY(-1px);
 }
 
 @media (max-width: 900px){
