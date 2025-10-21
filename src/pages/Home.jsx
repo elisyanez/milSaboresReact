@@ -36,6 +36,7 @@ export default function Home() {
           </div>
 
           <div className="hero-media">
+            {/* Imagen decorativa a la derecha del hero */}
             <img src="/IMG/Logo1.png" alt="Mil Sabores" className="home-logo" />
           </div>
         </section>

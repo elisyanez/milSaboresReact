@@ -83,3 +83,95 @@ h1,h2,h3,.brand {
   /* Pacifico is a display script - usually used at normal weight */
   line-height: 1.15;
 }
+
+/* HERO SECTION */
+.hero-main {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 36px 18px;
+  background: linear-gradient(180deg, rgba(255,240,235,0.9), rgba(255,250,250,0.8));
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(93,64,55,0.06);
+  margin: 18px 0;
+}
+
+.hero-copy {
+  flex: 1 1 55%;
+  max-width: 720px;
+}
+
+.hero-copy h1 {
+  font-size: 2.2rem;
+  margin-bottom: 12px;
+  color: var(--tabla-texto);
+}
+
+.hero-copy p {
+  color: rgba(93,64,55,0.9);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.hero-tagline {
+  margin-top: 14px;
+  font-size: 1.25rem;
+  color: #8a5a4a;
+}
+
+.hero-media {
+  flex: 0 0 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-media .home-logo {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+  background: white;
+  padding: 12px;
+}
+
+/* ACTIONS */
+.actions {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin: 18px 0;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.04);
+}
+
+.actions h2 { color: var(--tabla-texto); margin-bottom: 14px; }
+
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.action-grid .btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 12px;
+  border-radius: 10px;
+  font-size: 15px;
+  box-shadow: 0 6px 0 rgba(126,182,230,0.08);
+}
+
+@media (max-width: 900px){
+  .hero-main { flex-direction: column; text-align: center; }
+  .hero-copy { max-width: none; }
+  .hero-media { order: -1; }
+  .action-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 520px){
+  .action-grid { grid-template-columns: 1fr; }
+  .hero-copy h1 { font-size: 1.6rem; }
+}
