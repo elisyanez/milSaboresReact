@@ -59,6 +59,11 @@ body {
   background-color: var(--tabla-fondo);
 }
 
+.hero-copy{
+  display: block;
+  align-items: center;
+}
+
 /* Cart styles */
 .cart-wrap { margin-left: 12px; }
 .cart-link { display: inline-flex; align-items: center; gap: 8px; color: #fff; text-decoration: none; padding: 6px 8px; }
