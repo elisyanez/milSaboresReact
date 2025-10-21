@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 
 export default function Home() {
   return (
@@ -44,31 +45,25 @@ export default function Home() {
         <section className="container actions">
           <h2>¿Qué deseas hacer hoy?</h2>
           <div className="action-grid">
-            <a href="Usuario.html" className="btn-primary">
+            <NavLink to="/usuario" className="btn-primary">
               Gestión de Usuario
-            </a>
-            <a href="Catalogo.html" className="btn-primary">
+            </NavLink>
+            <NavLink to="/catalogo" className="btn-primary">
               Catálogo de productos
-            </a>
-            <a href="Pedido.html" className="btn-primary">
+            </NavLink>
+            <NavLink to="/pedido" className="btn-primary">
               Tu Pedido
-            </a>
-            <a href="Noticias.html" className="btn-primary">
+            </NavLink>
+            <NavLink to="/blogs" className="btn-primary">
               Noticias
-            </a>
-            <a href="Beneficios.html" className="btn-primary">
+            </NavLink>
+            <NavLink to="/beneficios" className="btn-primary">
               Promociones
-            </a>
-            <a href="Consejos.html" className="btn-primary">
+            </NavLink>
+            <NavLink to="/consejos" className="btn-primary">
               Consejos
-            </a>
+            </NavLink>
           </div>
-        </section>
-
-
-        <section className="container">
-          <h3>ÚLTIMAS NOTICIAS</h3>
-          {/* Placeholder for news image or cards */}
         </section>
       </section>
     </main>
