@@ -20,6 +20,9 @@ const descripciones = {
   TE002: 'Elegante torta nupcial por pisos, diseño a medida.'
 };
 
+// Fallback image (SVG) for missing product images
+const PLACEHOLDER_IMG = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="220"><rect width="100%25" height="100%25" fill="%23FFF5E1"/><text x="50%25" y="44%25" dominant-baseline="middle" text-anchor="middle" fill="%235D4037" font-size="16" font-family="Lato, Arial">Imagen no disponible</text><text x="50%25" y="60%25" dominant-baseline="middle" text-anchor="middle" fill="%23E58A2E" font-size="14" font-family="Lato, Arial">Dulce por venir</text></svg>';
+
 const productos = [
   { codigo: 'TC001', categoria: 'Tortas Cuadradas', nombre: 'Torta Cuadrada de Chocolate', precio: '$45.000 CLP', img: '/IMG/torta-chocolate.jpg' },
   { codigo: 'TC002', categoria: 'Tortas Cuadradas', nombre: 'Torta Cuadrada de Frutas', precio: '$50.000 CLP', img: '/IMG/torta-frutas.jpg' },
@@ -63,7 +66,7 @@ export default function Catalogo() {
         {productos.map((prod) => (
           <div className="producto-card" key={prod.codigo} onClick={() => abrir(prod)} role="button" tabIndex={0} onKeyDown={(e)=> (e.key==='Enter'||e.key===' ') && abrir(prod)}>
             <div className="producto-img-wrap">
-              <img src={prod.img} alt={prod.nombre} className="producto-img" />
+              <img src={prod.img} alt={prod.nombre} className="producto-img" onError={(e)=>{ e.currentTarget.onerror=null; e.currentTarget.src=PLACEHOLDER_IMG; }} />
               <div className="producto-desc">{descripciones[prod.codigo] ?? prod.categoria}</div>
             </div>
             <div className="producto-nombre">{prod.nombre}</div>
@@ -76,7 +79,7 @@ export default function Catalogo() {
           <div className="modal-card" onClick={(e)=> e.stopPropagation()}>
             <div className="modal-header"><h3>{seleccionado.nombre}</h3></div>
             <div className="modal-body">
-              <img src={seleccionado.img} alt={seleccionado.nombre} className="modal-img" />
+              <img src={seleccionado.img} alt={seleccionado.nombre} className="modal-img" onError={(e)=>{ e.currentTarget.onerror=null; e.currentTarget.src=PLACEHOLDER_IMG; }} />
               <p className="modal-desc">{descripciones[seleccionado.codigo] ?? seleccionado.categoria}</p>
               <div className="modal-precio">{seleccionado.precio}</div>
               <label className="modal-qty">Cantidad
