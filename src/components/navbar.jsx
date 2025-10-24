@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useUser } from '../context/UserContext';
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const linkClass = ({ isActive }) => (isActive ? 'active' : undefined);
   const { count } = useCart();
+  const { currentUser, logout } = useUser();
 
   return (
     <header className="topbar">
@@ -41,6 +43,26 @@ export default function Navbar() {
           <NavLink to="/contacto" className={linkClass}>
             Contacto
           </NavLink>
+          {!currentUser ? (
+            <>
+              <NavLink to="/login" className={linkClass}>Iniciar Sesion</NavLink>
+            </>
+          ) : (
+            <>
+              <span className="nav-user">Hola, {currentUser.nombre.split(' ')[0]}</span>
+              <button
+                className="btn btn-secondary"
+                onClick={() => {
+                  if (window.confirm('¿Seguro que quieres cerrar sesión?')) {
+                    logout();
+                    setOpen(false);
+                  }
+                }}
+              >
+                Salir
+              </button>
+            </>
+          )}
         </nav>
 
         <div className="cart-wrap">
@@ -67,6 +89,23 @@ export default function Navbar() {
         <NavLink to="/contacto" className={linkClass} onClick={() => setOpen(false)}>
           Contacto
         </NavLink>
+        {!currentUser ? (
+          <>
+            <NavLink to="/login" className={linkClass} onClick={() => setOpen(false)}>Iniciar Sesion</NavLink>
+          </>
+        ) : (
+          <button
+            className="btn btn-secondary"
+            onClick={() => {
+              if (window.confirm('¿Seguro que quieres cerrar sesión?')) {
+                logout();
+                setOpen(false);
+              }
+            }}
+          >
+            Salir
+          </button>
+        )}
       </div>
     </header>
   );

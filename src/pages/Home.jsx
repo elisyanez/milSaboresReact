@@ -1,7 +1,9 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
 
 export default function Home() {
+  const { currentUser } = useUser();
   return (
     <main className="page-container">
       <section>
@@ -37,7 +39,6 @@ export default function Home() {
           </div>
 
           <div className="hero-media">
-            {/* Imagen decorativa a la derecha del hero */}
             <img src="/IMG/Logo1.png" alt="Mil Sabores" className="home-logo" />
           </div>
         </section>
@@ -45,39 +46,41 @@ export default function Home() {
         <section className="container actions">
           <h2>¿Qué deseas hacer hoy?</h2>
           <div className="action-grid">
-            <NavLink 
-              to="/usuario" 
-              className={({ isActive }) => isActive ? "btn-primary active" : "btn-primary"}
-            >
-              Gestión de Usuario
-            </NavLink>
-            <NavLink 
-              to="/catalogo" 
-              className={({ isActive }) => isActive ? "btn-primary active" : "btn-primary"}
+            {currentUser?.role === 'admin' && (
+              <NavLink
+                to="/usuario"
+                className={({ isActive }) => (isActive ? 'btn-primary active' : 'btn-primary')}
+              >
+                Gestión de Usuario
+              </NavLink>
+            )}
+            <NavLink
+              to="/catalogo"
+              className={({ isActive }) => (isActive ? 'btn-primary active' : 'btn-primary')}
             >
               Catálogo de productos
             </NavLink>
-            <NavLink 
-              to="/pedido" 
-              className={({ isActive }) => isActive ? "btn-primary active" : "btn-primary"}
+            <NavLink
+              to="/pedido"
+              className={({ isActive }) => (isActive ? 'btn-primary active' : 'btn-primary')}
             >
               Tu Pedido
             </NavLink>
-            <NavLink 
-              to="/blogs" 
-              className={({ isActive }) => isActive ? "btn-primary active" : "btn-primary"}
+            <NavLink
+              to="/blogs"
+              className={({ isActive }) => (isActive ? 'btn-primary active' : 'btn-primary')}
             >
               Noticias
             </NavLink>
-            <NavLink 
-              to="/beneficios" 
-              className={({ isActive }) => isActive ? "btn-primary active" : "btn-primary"}
+            <NavLink
+              to="/beneficios"
+              className={({ isActive }) => (isActive ? 'btn-primary active' : 'btn-primary')}
             >
               Promociones
             </NavLink>
-            <NavLink 
-              to="/consejos" 
-              className={({ isActive }) => isActive ? "btn-primary active" : "btn-primary"}
+            <NavLink
+              to="/consejos"
+              className={({ isActive }) => (isActive ? 'btn-primary active' : 'btn-primary')}
             >
               Consejos
             </NavLink>
@@ -87,3 +90,4 @@ export default function Home() {
     </main>
   );
 }
+

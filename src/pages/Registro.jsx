@@ -1,0 +1,154 @@
+import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
+import { regiones } from '../data/regionesComunas';
+
+function validarRun(runRaw) {
+  if (!runRaw) return false;
+  const txt = runRaw.trim();
+  if (/[-.]/.test(txt)) return false; // sin puntos ni guion
+  if (txt.length < 7 || txt.length > 9) return false;
+  if (!/^[0-9]+[0-9Kk]$/.test(txt)) return false;
+  const cuerpo = txt.slice(0, -1);
+  const dv = txt.slice(-1).toUpperCase();
+  let suma = 0, multip = 2;
+  for (let i = cuerpo.length - 1; i >= 0; i--) {
+    suma += Number(cuerpo[i]) * multip;
+    multip = multip === 7 ? 2 : multip + 1;
+  }
+  const res = 11 - (suma % 11);
+  const dvCalc = res === 11 ? '0' : res === 10 ? 'K' : String(res);
+  return dv === dvCalc;
+}
+
+function validarCorreo(email) {
+  if (!email) return false;
+  const txt = email.trim().toLowerCase();
+  if (txt.length > 100) return false;
+  if (!/^[^\s@]+@([^\s@]+)$/.test(txt)) return false;
+  return /@(duoc\.cl|profesor\.duoc\.cl|gmail\.com)$/.test(txt);
+}
+
+export default function Registro() {
+  const { register } = useUser();
+  const navigate = useNavigate();
+  const [form, setForm] = useState({
+    run: '', nombre: '', apellidos: '', correo: '', fechaNacimiento: '', region: '', comuna: '', direccion: '', password: ''
+  });
+  const [errors, setErrors] = useState({});
+
+  const comunas = useMemo(() => {
+    const r = regiones.find(r => r.region === form.region);
+    return r ? r.comunas : [];
+  }, [form.region]);
+
+  const onChange = (e) => {
+    const { name, value } = e.target;
+    setForm(f => ({ ...f, [name]: value }));
+  };
+
+  const validate = () => {
+    const e = {};
+    if (!form.run) e.run = 'RUN es requerido';
+    else if (!validarRun(form.run)) e.run = 'RUN inválido (sin puntos ni guion, con dígito verificador)';
+    if (!form.nombre) e.nombre = 'Nombre requerido';
+    else if (form.nombre.length > 50) e.nombre = 'Máx 50 caracteres';
+    if (!form.apellidos) e.apellidos = 'Apellidos requeridos';
+    else if (form.apellidos.length > 100) e.apellidos = 'Máx 100 caracteres';
+    if (!form.correo) e.correo = 'Correo requerido';
+    else if (!validarCorreo(form.correo)) e.correo = 'Correo inválido o dominio no permitido';
+    if (!form.direccion) e.direccion = 'Dirección requerida';
+    else if (form.direccion.length > 300) e.direccion = 'Máx 300 caracteres';
+    if (!form.region) e.region = 'Seleccione una región';
+    if (!form.comuna) e.comuna = 'Seleccione una comuna';
+    if (!form.password) e.password = 'Contraseña requerida';
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+    try {
+      register({
+        run: form.run.trim(),
+        nombre: form.nombre.trim(),
+        apellidos: form.apellidos.trim(),
+        correo: form.correo.trim(),
+        fechaNacimiento: form.fechaNacimiento,
+        region: form.region,
+        comuna: form.comuna,
+        direccion: form.direccion.trim()
+      }, form.password);
+      alert('Usuario creado con éxito. Ahora puedes iniciar sesión.');
+      navigate('/login');
+    } catch (err) {
+      setErrors({ form: err.message || 'Error al registrar' });
+    }
+  };
+
+  return (
+    <main className="page-container">
+      <h2 className="page-title">Crear Cuenta</h2>
+      <form onSubmit={onSubmit} className="form-card">
+        {errors.form && <div className="form-error">{errors.form}</div>}
+        <div className="form-grid">
+          <label>
+            RUN (sin puntos ni guion)
+            <input name="run" value={form.run} onChange={onChange} placeholder="19011022K" />
+            {errors.run && <span className="field-error">{errors.run}</span>}
+          </label>
+          <label>
+            Nombre
+            <input name="nombre" value={form.nombre} onChange={onChange} />
+            {errors.nombre && <span className="field-error">{errors.nombre}</span>}
+          </label>
+          <label>
+            Apellidos
+            <input name="apellidos" value={form.apellidos} onChange={onChange} />
+            {errors.apellidos && <span className="field-error">{errors.apellidos}</span>}
+          </label>
+          <label>
+            Correo
+            <input name="correo" value={form.correo} onChange={onChange} type="email" placeholder="usuario@duoc.cl" />
+            {errors.correo && <span className="field-error">{errors.correo}</span>}
+          </label>
+          <label>
+            Fecha Nacimiento (opcional)
+            <input name="fechaNacimiento" value={form.fechaNacimiento} onChange={onChange} type="date" />
+          </label>
+          <label>
+            Región
+            <select name="region" value={form.region} onChange={onChange}>
+              <option value="">Seleccione región</option>
+              {regiones.map(r => <option key={r.region} value={r.region}>{r.region}</option>)}
+            </select>
+            {errors.region && <span className="field-error">{errors.region}</span>}
+          </label>
+          <label>
+            Comuna
+            <select name="comuna" value={form.comuna} onChange={onChange} disabled={!form.region}>
+              <option value="">Seleccione comuna</option>
+              {comunas.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+            {errors.comuna && <span className="field-error">{errors.comuna}</span>}
+          </label>
+          <label className="wide">
+            Dirección
+            <input name="direccion" value={form.direccion} onChange={onChange} />
+            {errors.direccion && <span className="field-error">{errors.direccion}</span>}
+          </label>
+          <label>
+            Contraseña
+            <input name="password" type="password" value={form.password} onChange={onChange} />
+            {errors.password && <span className="field-error">{errors.password}</span>}
+          </label>
+        </div>
+        <div className="form-actions">
+          <button className="btn btn-primary" type="submit">Crear cuenta</button>
+        </div>
+      </form>
+    </main>
+  );
+}
+

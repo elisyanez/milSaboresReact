@@ -1,9 +1,27 @@
-import React, { createContext, useContext, useState, useMemo } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
+import { useUser } from './UserContext';
 
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
+  const { currentUser } = useUser();
+  const storageKey = useMemo(() => `cart_${currentUser?.run || 'guest'}`, [currentUser]);
+
+  // Load cart when user changes
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      setItems(raw ? JSON.parse(raw) : []);
+    } catch {
+      setItems([]);
+    }
+  }, [storageKey]);
+
+  // Persist cart per-user
+  useEffect(() => {
+    localStorage.setItem(storageKey, JSON.stringify(items));
+  }, [items, storageKey]);
 
   const addItem = (item) => {
     setItems((prev) => [...prev, item]);

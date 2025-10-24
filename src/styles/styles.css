@@ -232,6 +232,22 @@
   .cart-col-image { grid-column: 1 / -1; justify-self: center; }
 }
 
+/* Empty cart state */
+.empty-cart {
+  max-width: 900px;
+  margin: 36px auto;
+  background: linear-gradient(180deg, #fffdf9, #fff5e6);
+  border: 1px solid rgba(229,138,46,0.15);
+  border-radius: 14px;
+  box-shadow: 0 10px 22px rgba(93,64,55,0.06);
+  text-align: center;
+  padding: 28px 18px;
+}
+.empty-emoji { font-size: 42px; margin-bottom: 8px; }
+.empty-title { font-family: var(--head-font); color: var(--tabla-texto); font-weight: 400; margin: 6px 0 4px; }
+.empty-text { color: rgba(93,64,55,0.8); margin-bottom: 14px; }
+.empty-cta { display: inline-block; }
+
 /* Style for nav links: default (on dark header) show as light text */
 .nav-links a {
   color: #fff;
@@ -472,6 +488,29 @@ h1,h2,h3,.brand {
   margin-bottom: 14px;
   text-align: center;
 }
+
+/* Forms */
+.form-card { background: #fff; border-radius: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.06); padding: 16px; max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+.form-error { background: #ffecec; color: #b00020; border: 1px solid #f5b5b5; padding: 8px 10px; border-radius: 8px; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.form-grid label { display: flex; flex-direction: column; gap: 6px; color: var(--tabla-texto); }
+.form-grid label.wide { grid-column: 1 / -1; }
+.form-grid input, .form-grid select, .form-card input { border: 1px solid #ddd; border-radius: 8px; padding: 8px 10px; }
+.field-error { color: #b00020; font-size: 12px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 10px; }
+
+.nav-user { color: #fff; opacity: 0.9; padding: 6px 10px; }
+
+/* Admin Users Table */
+.user-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.user-table th, .user-table td { border-bottom: 2px solid rgba(229,138,46,0.18); padding: 10px; text-align: left; }
+.user-table th { background: #fff8f3; color: var(--tabla-texto); position: sticky; top: 0; z-index: 1; }
+.user-table tr:nth-child(even) td { background: rgba(255,240,230,0.35); }
+.user-table tr:hover td { background: rgba(229,138,46,0.08); }
+.user-table td.actions-cell { white-space: nowrap; }
+.user-table td.actions-cell .btn { margin-right: 6px; }
+.user-table td.actions-cell .btn:last-child { margin-right: 0; }
+.btn-xs { padding: 6px 10px; font-size: 12px; line-height: 1.1; }
 
 .action-grid {
   display: grid;

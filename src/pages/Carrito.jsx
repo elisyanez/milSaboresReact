@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 
 export default function Carrito() {
@@ -11,7 +12,12 @@ export default function Carrito() {
     <main className="page-container">
       <h2 className="page-title">Carrito</h2>
       {groupedItems.length === 0 ? (
-        <p>Tu carrito está vacío.</p>
+        <div className="empty-cart">
+          <div className="empty-emoji" aria-hidden>🧁🍰🥐</div>
+          <h3 className="empty-title">Tu caja de dulces está vacía</h3>
+          <p className="empty-text">Agrega tortas, postres y panes para endulzar tu día.</p>
+          <Link to="/catalogo" className="btn btn-primary empty-cta">Ir al catálogo</Link>
+        </div>
       ) : (
         <div className="cart-list">
           {groupedItems.map((it) => (
@@ -41,7 +47,13 @@ export default function Carrito() {
           <div className="cart-total">
             <div className="cart-total-line"><strong>Total:</strong> {fmt.format(total)}</div>
             <div className="cart-actions">
-              <button className="btn btn-outline-danger" onClick={clear}>Vaciar carrito</button>
+              <button
+                className="btn btn-outline-danger"
+                onClick={() => { if (window.confirm('¿Vaciar todo el carrito?')) clear(); }}
+              >
+                Vaciar carrito
+              </button>
+              <Link to="/catalogo" className="btn btn-primary">Seguir comprando</Link>
             </div>
           </div>
         </div>
