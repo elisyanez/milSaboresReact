@@ -22,7 +22,7 @@ export default function Login() {
   return (
     <main className="page-container">
       <h2 className="page-title">Iniciar Sesion</h2>
-      <form onSubmit={onSubmit} className="form-card">
+      <form onSubmit={onSubmit} className="form-card login-form">
         {error && <div className="form-error">{error}</div>}
         <label>
           RUN o Correo
@@ -32,15 +32,13 @@ export default function Login() {
           Contrasena
           <input type="password" value={password} onChange={(e)=> setPassword(e.target.value)} />
         </label>
-        <div className="form-actions">
+        <div className="form-actions" style={{ justifyContent: 'center', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
           <button className="btn btn-primary" type="submit">Iniciar Sesion</button>
-        </div>
-        <div className="form-actions" style={{ justifyContent: 'flex-start' }}>
+          <div className="create-account" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <span style={{ color: 'rgba(93,64,55,0.85)' }}>¿No tienes cuenta? </span>
           <Link to="/registro" className="btn btn-outline-secondary">Crear cuenta</Link>
-        </div>
+        </div></div>
       </form>
     </main>
   );
 }
-

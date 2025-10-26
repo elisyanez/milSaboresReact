@@ -510,14 +510,18 @@ h1,h2,h3,.brand {
 .user-table td.actions-cell { white-space: nowrap; }
 .user-table td.actions-cell .btn { margin-right: 6px; }
 .user-table td.actions-cell .btn:last-child { margin-right: 0; }
+
+/* Login form layout tweaks */
+.login-form label { display: flex; flex-direction: column; gap: 10px; }
 .btn-xs { padding: 6px 10px; font-size: 12px; line-height: 1.1; }
 
 .action-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   max-width: 900px;
   margin: 0 auto;
+  justify-content: center;
 }
 
 .action-grid .btn-primary {
@@ -534,6 +538,9 @@ h1,h2,h3,.brand {
   border-color: var(--tabla-naranja);
   color: white;
   transition: all 0.3s ease;
+  /* Make buttons lay out nicely in centered rows */
+  flex: 1 1 280px; /* grow, shrink, preferred width */
+  max-width: 300px;
 }
 
 .action-grid .btn-primary:hover {
@@ -561,10 +568,9 @@ h1,h2,h3,.brand {
   .hero-main { flex-direction: column; text-align: center; }
   .hero-copy { max-width: none; }
   .hero-media { order: -1; }
-  .action-grid { grid-template-columns: repeat(2, 1fr); }
+  /* Keep buttons centered; allow two per row naturally via flex-basis */
 }
 
 @media (max-width: 520px){
-  .action-grid { grid-template-columns: 1fr; }
   .hero-copy h1 { font-size: 1.6rem; }
 }

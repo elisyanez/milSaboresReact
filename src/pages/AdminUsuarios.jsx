@@ -59,7 +59,7 @@ export default function AdminUsuarios(){
     <main className="page-container">
       <h2 className="page-title">Gestión de Usuarios</h2>
 
-      <div className="form-card" style={{overflowX:'auto'}}>
+      <div className="form-card" style={{ overflowX:'auto', maxWidth: 'none', width: '100%' }}>
         <table className="user-table">
           <thead>
             <tr>
@@ -153,7 +153,7 @@ export default function AdminUsuarios(){
           </div>
         </div>
       )}
-      <div className="form-actions" style={{marginTop: 12, justifyContent:'space-between'}}>
+      <div className="form-actions" style={{ marginTop: 12, justifyContent: 'center', gap: 12 }}>
         <button className="btn btn-primary" onClick={startCreate}>Nuevo usuario</button>
         <Link className="btn btn-secondary" to="/">Volver al inicio</Link>
       </div>
