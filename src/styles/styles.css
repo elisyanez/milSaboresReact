@@ -497,6 +497,7 @@ h1,h2,h3,.brand {
 .form-grid label.wide { grid-column: 1 / -1; }
 .form-grid input, .form-grid select, .form-card input { border: 1px solid #ddd; border-radius: 8px; padding: 8px 10px; }
 .field-error { color: #b00020; font-size: 12px; }
+.form-success { background: #e7f7ec; color: #0b7a28; border: 1px solid #b6e2c3; padding: 8px 10px; border-radius: 8px; }
 .form-actions { display: flex; justify-content: flex-end; gap: 10px; }
 
 .nav-user { color: #fff; opacity: 0.9; padding: 6px 10px; }

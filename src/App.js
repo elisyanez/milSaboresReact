@@ -10,6 +10,7 @@ import Contacto from './pages/Contacto';
 import Registro from './pages/Registro';
 import Login from './pages/Login';
 import AdminUsuarios from './pages/AdminUsuarios';
+import Perfil from './pages/Perfil';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/registro" element={<Registro />} />
         <Route path="/login" element={<Login />} />
         <Route path="/usuario" element={<AdminUsuarios />} />
+        <Route path="/perfil" element={<Perfil />} />
         <Route path="*" element={<h1>404 - Página no encontrada</h1>} />
       </Routes>
     </>

@@ -49,7 +49,7 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <span className="nav-user">Hola, {currentUser.nombre.split(' ')[0]}</span>
+              <NavLink to="/perfil" className={linkClass}>Perfil</NavLink>
               <button
                 className="btn btn-secondary"
                 onClick={() => {
@@ -94,17 +94,20 @@ export default function Navbar() {
             <NavLink to="/login" className={linkClass} onClick={() => setOpen(false)}>Iniciar Sesion</NavLink>
           </>
         ) : (
-          <button
-            className="btn btn-secondary"
-            onClick={() => {
-              if (window.confirm('¿Seguro que quieres cerrar sesión?')) {
-                logout();
-                setOpen(false);
-              }
-            }}
-          >
-            Salir
-          </button>
+          <>
+            <NavLink to="/perfil" className={linkClass} onClick={() => setOpen(false)}>Mi Perfil</NavLink>
+            <button
+              className="btn btn-secondary"
+              onClick={() => {
+                if (window.confirm('A?Seguro que quieres cerrar sesiA3n?')) {
+                  logout();
+                  setOpen(false);
+                }
+              }}
+            >
+              Salir
+            </button>
+          </>
         )}
       </div>
     </header>

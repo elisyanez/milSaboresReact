@@ -54,6 +54,14 @@ export default function Home() {
                 Gestión de Usuario
               </NavLink>
             )}
+            {currentUser && (
+              <NavLink
+                to="/perfil"
+                className={({ isActive }) => (isActive ? 'btn-primary active' : 'btn-primary')}
+              >
+                Mi Perfil
+              </NavLink>
+            )}
             <NavLink
               to="/catalogo"
               className={({ isActive }) => (isActive ? 'btn-primary active' : 'btn-primary')}
