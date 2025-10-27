@@ -3,7 +3,7 @@ import { parseCLP } from './money.logic.js';
 export function groupItems(items) {
   const map = new Map();
   for (const it of items || []) {
-    const key = it.codigo;
+    const key = it.groupKey || it.codigo;
     const prev = map.get(key);
     if (prev) {
       prev.cantidad += Number(it.cantidad) || 1;
@@ -14,6 +14,8 @@ export function groupItems(items) {
         precio: it.precio,
         img: it.img,
         cantidad: Number(it.cantidad) || 1,
+        personalizacion: it.personalizacion,
+        groupKey: it.groupKey,
       });
     }
   }
@@ -22,8 +24,8 @@ export function groupItems(items) {
 
 export function updateQuantityInList(list, codigo, nuevaCantidad) {
   const prev = Array.from(list || []);
-  const rep = prev.find((p) => p.codigo === codigo);
-  const others = prev.filter((p) => p.codigo !== codigo);
+  const rep = prev.find((p) => (p.groupKey || p.codigo) === codigo);
+  const others = prev.filter((p) => (p.groupKey || p.codigo) !== codigo);
   const qty = Number(nuevaCantidad) || 0;
   if (!rep || qty <= 0) return others;
   return [
@@ -34,8 +36,8 @@ export function updateQuantityInList(list, codigo, nuevaCantidad) {
 
 export function removeQuantityInList(list, codigo, qtyToRemove) {
   const prev = Array.from(list || []);
-  const current = prev.filter((p) => p.codigo === codigo);
-  const others = prev.filter((p) => p.codigo !== codigo);
+  const current = prev.filter((p) => (p.groupKey || p.codigo) === codigo);
+  const others = prev.filter((p) => (p.groupKey || p.codigo) !== codigo);
   const totalQty = current.reduce((a, c) => a + (Number(c.cantidad) || 1), 0);
   const newQty = Math.max(0, totalQty - (Number(qtyToRemove) || 0));
   if (newQty <= 0) return others;
@@ -56,4 +58,3 @@ export function totalFromGrouped(grouped) {
     0
   );
 }
-
