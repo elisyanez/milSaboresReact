@@ -2,9 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { regiones } from '../data/regionesComunas';
-
-function validarRunSimple(txt){ return !!txt && !/[.-]/.test(txt) && txt.length>=7 && txt.length<=9; }
-function validarCorreo(email){ return /^[^\s@]+@([^\s@]+)$/.test((email||'').trim()); }
+import { validarRunSimple, validarCorreo } from '../utils/user.logic';
 
 export default function AdminUsuarios(){
   const { users, currentUser, register, updateUser, deleteUser } = useUser();

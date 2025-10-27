@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 import { useUser } from './UserContext';
+import { parseCLP } from '../utils/money.logic';
+import { groupItems, updateQuantityInList, removeQuantityInList, countItems } from '../utils/cart.logic';
 
 const CartContext = createContext(null);
 
@@ -33,63 +35,17 @@ export function CartProvider({ children }) {
 
   const clear = () => setItems([]);
 
-  const parseCLP = (str) => {
-    if (!str) return 0;
-    const digits = String(str).replace(/[^0-9]/g, '');
-    return Number.parseInt(digits || '0', 10);
-  };
-
-  const groupedItems = useMemo(() => {
-    const map = new Map();
-    for (const it of items) {
-      const key = it.codigo;
-      const prev = map.get(key);
-      if (prev) {
-        prev.cantidad += Number(it.cantidad) || 1;
-      } else {
-        map.set(key, {
-          codigo: it.codigo,
-          nombre: it.nombre,
-          precio: it.precio,
-          img: it.img,
-          cantidad: Number(it.cantidad) || 1,
-        });
-      }
-    }
-    return Array.from(map.values());
-  }, [items]);
+  const groupedItems = useMemo(() => groupItems(items), [items]);
 
   const updateQuantity = (codigo, nuevaCantidad) => {
-    setItems((prev) => {
-      const rep = prev.find((p) => p.codigo === codigo);
-      const others = prev.filter((p) => p.codigo !== codigo);
-      const qty = Number(nuevaCantidad) || 0;
-      if (!rep || qty <= 0) return others;
-      return [
-        ...others,
-        { codigo: rep.codigo, nombre: rep.nombre, precio: rep.precio, img: rep.img, cantidad: qty },
-      ];
-    });
+    setItems((prev) => updateQuantityInList(prev, codigo, nuevaCantidad));
   };
 
   const removeQuantity = (codigo, qtyToRemove) => {
-    setItems((prev) => {
-      const current = prev.filter((p) => p.codigo === codigo);
-      const others = prev.filter((p) => p.codigo !== codigo);
-      const totalQty = current.reduce((a, c) => a + (Number(c.cantidad) || 1), 0);
-      const newQty = Math.max(0, totalQty - (Number(qtyToRemove) || 0));
-      if (newQty <= 0) return others;
-      const rep = current[0];
-      return [
-        ...others,
-        { codigo: rep.codigo, nombre: rep.nombre, precio: rep.precio, img: rep.img, cantidad: newQty },
-      ];
-    });
+    setItems((prev) => removeQuantityInList(prev, codigo, qtyToRemove));
   };
 
-  const totalCount = useMemo(() => {
-    return items.reduce((acc, it) => acc + (Number(it.cantidad) || 1), 0);
-  }, [items]);
+  const totalCount = useMemo(() => countItems(items), [items]);
 
   const total = useMemo(() => {
     return groupedItems.reduce((acc, it) => acc + parseCLP(it.precio) * (Number(it.cantidad) || 1), 0);

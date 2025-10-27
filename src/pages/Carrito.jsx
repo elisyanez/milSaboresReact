@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { parseCLP } from '../utils/money.logic';
 
 export default function Carrito() {
   const { groupedItems, updateQuantity, removeQuantity, total, clear } = useCart();
 
   const fmt = useMemo(() => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }), []);
-  const parseCLP = (str) => Number.parseInt(String(str).replace(/[^0-9]/g, '') || '0', 10);
 
   return (
     <main className="page-container">

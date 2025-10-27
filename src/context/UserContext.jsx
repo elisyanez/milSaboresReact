@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useMemo, useState, useEffect } from 'react';
+import { ensureAdminSeed, registerUser, loginFind, updateUserInList, deleteUserFromList } from '../utils/userContext.logic';
 
 const UserContext = createContext(null);
 
@@ -19,24 +20,7 @@ function saveUsers(users) {
 }
 
 export function UserProvider({ children }) {
-  const [users, setUsers] = useState(() => {
-    const existing = loadUsers();
-    const hasAdmin = existing.some(u => u.run === 'admin123');
-    if (!hasAdmin) {
-      existing.push({
-        run: 'admin123',
-        nombre: 'Admin',
-        apellidos: 'General',
-        correo: 'admin@local',
-        role: 'admin',
-        password: 'admin123',
-        region: '',
-        comuna: '',
-        direccion: ''
-      });
-    }
-    return existing;
-  });
+  const [users, setUsers] = useState(() => ensureAdminSeed(loadUsers()))
   const [currentRun, setCurrentRun] = useState(() => localStorage.getItem(CURRENT_KEY) || null);
 
   const currentUser = useMemo(() => users.find(u => u.run === currentRun) || null, [users, currentRun]);
@@ -47,20 +31,13 @@ export function UserProvider({ children }) {
   }, [currentRun]);
 
   const register = (user, password, role = 'client') => {
-    // user: { run, nombre, apellidos, correo, fechaNacimiento?, region, comuna, direccion }
-    if (users.some(u => u.run === user.run)) {
-      throw new Error('Ya existe un usuario con ese RUN');
-    }
-    const toSave = { ...user, role, password }; // Nota: demo. No usar texto plano en producción.
-    setUsers(prev => [...prev, toSave]);
-    return toSave;
+    const newList = registerUser(users, user, password, role);
+    setUsers(newList);
+    return newList.find(u => u.run === user.run);
   };
 
   const login = (identifier, password) => {
-    const id = (identifier || '').trim();
-    const u = users.find(u => u.run === id || u.correo.toLowerCase() === id.toLowerCase());
-    if (!u) throw new Error('Usuario no encontrado');
-    if (u.password !== password) throw new Error('Contraseña incorrecta');
+    const u = loginFind(users, identifier, password);
     setCurrentRun(u.run);
     return u;
   };
@@ -68,12 +45,11 @@ export function UserProvider({ children }) {
   const logout = () => setCurrentRun(null);
 
   const updateUser = (run, patch) => {
-    setUsers(prev => prev.map(u => u.run === run ? { ...u, ...patch, run: u.run } : u));
+    setUsers(prev => updateUserInList(prev, run, patch));
   };
 
   const deleteUser = (run) => {
-    setUsers(prev => prev.filter(u => u.run !== run));
-    // clear current if deleting self
+    setUsers(prev => deleteUserFromList(prev, run));
     setCurrentRun(cr => (cr === run ? null : cr));
   };
 
@@ -89,3 +65,4 @@ export function useUser() {
 }
 
 export default UserContext;
+
