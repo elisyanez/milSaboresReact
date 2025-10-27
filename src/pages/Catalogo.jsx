@@ -1,47 +1,14 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
+import { productos as productosDB, descripciones as descripcionesDB } from '../data/db';
 import { sanitizeCantidad, buildDescripcion } from '../utils/catalogo.logic';
 
-const descripciones = {
-  TC001: 'Bizcocho de cacao húmedo con capas de ganache de chocolate.',
-  TC002: 'Bizcocho suave con frutas de temporada y crema pastelera ligera.',
-  TT001: 'Bizcocho de vainilla esponjoso con buttercream de vainilla.',
-  TT002: 'Bizcocho de vainilla relleno y cubierto con manjar.',
-  PI001: 'Postre individual de mousse aireado de chocolate semiamargo.',
-  PI002: 'Clásico italiano con queso mascarpone, café y cacao.',
-  PSA001: 'Versión sin azúcar con jugo y ralladura de naranja.',
-  PSA002: 'Cheesecake cremoso endulzado sin azúcar, sobre base crocante.',
-  PT001: 'Clásica empanada dulce rellena de manzana especiada.',
-  PT002: 'Tarta tradicional de almendra con cobertura de azúcar glas.',
-  PG001: 'Brownie intenso y húmedo, libre de gluten.',
-  PG002: 'Pan casero suave, elaborado sin gluten.',
-  PV001: 'Torta vegana de cacao intenso, sin lácteos ni huevos.',
-  PV002: 'Galletas crujientes de avena con chips de chocolate.',
-  TE001: 'Torta personalizada para cumpleaños, sabores y decoración a elección.',
-  TE002: 'Elegante torta nupcial por pisos, diseño a medida.'
-};
+const descripciones = descripcionesDB;
 
 // Fallback image (SVG) for missing product images
 const PLACEHOLDER_IMG = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="220"><rect width="100%25" height="100%25" fill="%23FFF5E1"/><text x="50%25" y="44%25" dominant-baseline="middle" text-anchor="middle" fill="%235D4037" font-size="16" font-family="Lato, Arial">Imagen no disponible</text><text x="50%25" y="60%25" dominant-baseline="middle" text-anchor="middle" fill="%23E58A2E" font-size="14" font-family="Lato, Arial">Dulce por venir</text></svg>';
 
-const productos = [
-  { codigo: 'TC001', categoria: 'Tortas Cuadradas', nombre: 'Torta Cuadrada de Chocolate', precio: '$45.000 CLP', img: '/IMG/torta-chocolate.jpg' },
-  { codigo: 'TC002', categoria: 'Tortas Cuadradas', nombre: 'Torta Cuadrada de Frutas', precio: '$50.000 CLP', img: '/IMG/torta-frutas.jpg' },
-  { codigo: 'TT001', categoria: 'Tortas Circulares', nombre: 'Torta Circular de Vainilla', precio: '$40.000 CLP', img: '/IMG/torta-vainilla.jpg' },
-  { codigo: 'TT002', categoria: 'Tortas Circulares', nombre: 'Torta Circular de Manjar', precio: '$42.000 CLP', img: '/IMG/torta-manjar.png' },
-  { codigo: 'PI001', categoria: 'Postres Individuales', nombre: 'Mousse de Chocolate', precio: '$5.000 CLP', img: '/IMG/mousse-chocolate.png' },
-  { codigo: 'PI002', categoria: 'Postres Individuales', nombre: 'Tiramisú Clásico', precio: '$5.500 CLP', img: '/IMG/tiramisu.png' },
-  { codigo: 'PSA001', categoria: 'Productos Sin Azúcar', nombre: 'Torta Sin Azúcar de Naranja', precio: '$48.000 CLP', img: '/IMG/torta-naranja-sin-azucar.png' },
-  { codigo: 'PSA002', categoria: 'Productos Sin Azúcar', nombre: 'Cheesecake Sin Azúcar', precio: '$47.000 CLP', img: '/IMG/cheesecake-sin-azucar.png' },
-  { codigo: 'PT001', categoria: 'Pastelería Tradicional', nombre: 'Empanada de Manzana', precio: '$3.000 CLP', img: '/IMG/empanada-manzana.png' },
-  { codigo: 'PT002', categoria: 'Pastelería Tradicional', nombre: 'Tarta de Santiago', precio: '$6.000 CLP', img: '/IMG/tarta-santiago.png' },
-  { codigo: 'PG001', categoria: 'Productos Sin Gluten', nombre: 'Brownie Sin Gluten', precio: '$4.000 CLP', img: '/IMG/brownie-sin-gluten.png' },
-  { codigo: 'PG002', categoria: 'Productos Sin Gluten', nombre: 'Pan Sin Gluten', precio: '$3.500 CLP', img: '/IMG/pan-sin-gluten.png' },
-  { codigo: 'PV001', categoria: 'Productos Veganos', nombre: 'Torta Vegana de Chocolate', precio: '$50.000 CLP', img: '/IMG/torta-vegana-chocolate.png' },
-  { codigo: 'PV002', categoria: 'Productos Veganos', nombre: 'Galletas Veganas de Avena', precio: '$4.500 CLP', img: '/IMG/galletas-vegana-avena.png' },
-  { codigo: 'TE001', categoria: 'Tortas Especiales', nombre: 'Torta Especial de Cumpleaños', precio: '$55.000 CLP', img: '/IMG/torta-cumpleanos.png' },
-  { codigo: 'TE002', categoria: 'Tortas Especiales', nombre: 'Torta Especial de Boda', precio: '$60.000 CLP', img: '/IMG/torta-boda.png' },
-];
+const productos = productosDB;
 
 export default function Catalogo() {
   const { addItem } = useCart();
@@ -97,3 +64,4 @@ export default function Catalogo() {
     </main>
   );
 }
+

@@ -1,34 +1,17 @@
 import React, { createContext, useContext, useMemo, useState, useEffect } from 'react';
-import { ensureAdminSeed, registerUser, loginFind, updateUserInList, deleteUserFromList } from '../utils/userContext.logic';
+import { registerUser, loginFind, updateUserInList, deleteUserFromList } from '../utils/userContext.logic';
+import { readUsers, writeUsers, readCurrentRun, writeCurrentRun } from '../data/db';
 
 const UserContext = createContext(null);
 
-const USERS_KEY = 'users_v1';
-const CURRENT_KEY = 'current_user_run_v1';
-
-function loadUsers() {
-  try {
-    const raw = localStorage.getItem(USERS_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
 export function UserProvider({ children }) {
-  const [users, setUsers] = useState(() => ensureAdminSeed(loadUsers()))
-  const [currentRun, setCurrentRun] = useState(() => localStorage.getItem(CURRENT_KEY) || null);
+  const [users, setUsers] = useState(() => readUsers());
+  const [currentRun, setCurrentRun] = useState(() => readCurrentRun());
 
   const currentUser = useMemo(() => users.find(u => u.run === currentRun) || null, [users, currentRun]);
 
-  useEffect(() => { saveUsers(users); }, [users]);
-  useEffect(() => {
-    if (currentRun) localStorage.setItem(CURRENT_KEY, currentRun); else localStorage.removeItem(CURRENT_KEY);
-  }, [currentRun]);
+  useEffect(() => { writeUsers(users); }, [users]);
+  useEffect(() => { writeCurrentRun(currentRun); }, [currentRun]);
 
   const register = (user, password, role = 'client') => {
     const newList = registerUser(users, user, password, role);
@@ -65,4 +48,3 @@ export function useUser() {
 }
 
 export default UserContext;
-
