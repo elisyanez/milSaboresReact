@@ -9,6 +9,10 @@ import Blogs from './pages/Blogs';
 import Contacto from './pages/Contacto';
 import Registro from './pages/Registro';
 import Login from './pages/Login';
+import ConfirmacionCompra from './pages/ConfirmacionCompra';
+import ComprobantePago from './pages/ComprobantePago';
+import MisPedidos from './pages/MisPedidos';
+import AdminPedidos from './pages/AdminPedidos';
 import AdminUsuarios from './pages/AdminUsuarios';
 import Perfil from './pages/Perfil';
 import GestionProductos from './pages/GestionProductos';
@@ -27,7 +31,11 @@ function App() {
         <Route path="/registro" element={<Registro />} />
         <Route path="/login" element={<Login />} />
         <Route path="/usuario" element={<AdminUsuarios />} />
-        <Route path="/perfil" element={<Perfil />} />
+                <Route path="/perfil" element={<Perfil />} />
+        <Route path="/confirmacion" element={<ConfirmacionCompra />} />
+        <Route path="/comprobante/:id" element={<ComprobantePago />} />
+        <Route path="/mis-pedidos" element={<MisPedidos />} />
+        <Route path="/admin-pedidos" element={<AdminPedidos />} />        
         <Route path="/gestionProductos" element={<GestionProductos />} />
         <Route path="*" element={<h1>404 - Página no encontrada</h1>} />
       </Routes>
@@ -37,3 +45,7 @@ function App() {
 }
 
 export default App;
+
+
+
+

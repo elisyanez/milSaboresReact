@@ -1,10 +1,13 @@
 import React, { useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { parseCLP } from '../utils/money.logic';
+import { useUser } from '../context/UserContext';
 
 export default function Carrito() {
   const { groupedItems, updateQuantity, removeQuantity, total, clear } = useCart();
+  const {currentUser} = useUser();
+  const navigate = useNavigate();
 
   const fmt = useMemo(() => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }), []);
 
@@ -65,13 +68,21 @@ export default function Carrito() {
               className="btn btn-outline-danger"
               onClick={() => { if (window.confirm('¿Vaciar todo el carrito?')) clear(); }}
             >
-              Vaciar carrito
-            </button>
-            <Link to="/catalogo" className="btn btn-primary">Seguir comprando</Link>
+              Vaciar carrito</button>
+            <button className="btn btn-primary" onClick={() => {
+              if (!currentUser) {
+                navigate('/login?redirect=/carrito');
+                return;
+              }
+              navigate('/confirmacion');
+            }}>Confirmar compra</button>
+            <Link to="/catalogo" className="btn btn-secondary">Seguir comprando</Link>
           </div>
         </div>
       </div>
     </main>
   );
 }
+
+
 
