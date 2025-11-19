@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
-import { productos as productosIniciales } from '../data/db';
+import { readProducts, writeProducts } from '../data/db';
 
 // Fallback image (mismo que en Catálogo)
 const PLACEHOLDER_IMG = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="220"><rect width="100%25" height="100%25" fill="%23FFF5E1"/><text x="50%25" y="44%25" dominant-baseline="middle" text-anchor="middle" fill="%235D4037" font-size="16" font-family="Lato, Arial">Imagen no disponible</text><text x="50%25" y="60%25" dominant-baseline="middle" text-anchor="middle" fill="%23E58A2E" font-size="14" font-family="Lato, Arial">Dulce por venir</text></svg>';
@@ -20,7 +20,7 @@ const CATEGORIAS = [
 
 export default function GestionProductos() {
   const { currentUser } = useUser();
-  const [productos, setProductos] = useState(productosIniciales);
+  const [productos, setProductos] = useState(() => readProducts());
   const [editando, setEditando] = useState(null); // 'NEW' o codigo del producto
   const [form, setForm] = useState({
     codigo: '',
@@ -146,7 +146,7 @@ const guardarProducto = async () => {
   };
 
   if (editando === 'NEW') {
-    setProductos(prev => [...prev, productoData]);
+    setProductos(prev => { const next = [...prev, productoData]; writeProducts(next); return next; });
   } else {
     setProductos(prev => prev.map(p => 
       p.codigo === editando ? productoData : p
@@ -159,7 +159,7 @@ const guardarProducto = async () => {
   // Eliminar producto
   const eliminarProducto = (codigo) => {
     if (window.confirm('¿Estás seguro de eliminar este producto?')) {
-      setProductos(prev => prev.filter(p => p.codigo !== codigo));
+      setProductos(prev => { const next = prev.filter(p => p.codigo !== codigo); writeProducts(next); return next; });
     }
   };
 
@@ -535,3 +535,6 @@ const subirImagenAlServidor = async (archivo) => {
     </main>
   );
 }
+
+
+

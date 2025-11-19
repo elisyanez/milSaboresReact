@@ -41,6 +41,25 @@ export const productos = [
   { codigo: 'TE002', categoria: 'Tortas Especiales', nombre: 'Torta Especial de Boda', precio: '$60.000 CLP', img: '/IMG/torta-boda.png' },
 ];
 
+// Products persistence (visibility, edits) in localStorage
+const PRODUCTS_KEY = 'productos_v1';
+
+export function readProducts() {
+  try {
+    const raw = localStorage.getItem(PRODUCTS_KEY);
+    if (!raw) return getProducts();
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return getProducts();
+    return parsed;
+  } catch {
+    return getProducts();
+  }
+}
+
+export function writeProducts(list) {
+  localStorage.setItem(PRODUCTS_KEY, JSON.stringify(list || []));
+}
+
 // Example seed users (can be loaded into localStorage by your context)
 export const seedUsers = [
   {

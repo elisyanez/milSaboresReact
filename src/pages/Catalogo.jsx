@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
-import { productos as productosDB, descripciones as descripcionesDB } from '../data/db';
+import { productos as productosDB, descripciones as descripcionesDB, readProducts } from '../data/db';
 import { sanitizeCantidad, buildDescripcion } from '../utils/catalogo.logic';
 import { parseCLP, formatCLP } from '../utils/money.logic';
 
@@ -9,7 +9,7 @@ const descripciones = descripcionesDB;
 // Fallback image (SVG) for missing product images
 const PLACEHOLDER_IMG = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="220"><rect width="100%25" height="100%25" fill="%23FFF5E1"/><text x="50%25" y="44%25" dominant-baseline="middle" text-anchor="middle" fill="%235D4037" font-size="16" font-family="Lato, Arial">Imagen no disponible</text><text x="50%25" y="60%25" dominant-baseline="middle" text-anchor="middle" fill="%23E58A2E" font-size="14" font-family="Lato, Arial">Dulce por venir</text></svg>';
 
-const productos = productosDB;
+const productos = (typeof window !== 'undefined' ? readProducts() : productosDB).filter(p => p.visible !== false);
 
 export default function Catalogo() {
   const { addItem } = useCart();

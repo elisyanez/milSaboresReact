@@ -613,13 +613,13 @@ h1,h2,h3,.brand {
   margin-top: 12px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 20px;
   width: 100%;
 }
 
 .controles-superiores {
   display: flex;
-  gap: 6px;
+  gap: 20px;
   justify-content: center;
 }
 
