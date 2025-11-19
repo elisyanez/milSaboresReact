@@ -575,3 +575,104 @@ h1,h2,h3,.brand {
 @media (max-width: 520px){
   .hero-copy h1 { font-size: 1.6rem; }
 }
+
+/* GESTION DE PRODUCTOS */
+
+.producto-oculto {
+  opacity: 0.6;
+  border: 2px dashed #ccc;
+}
+
+.producto-admin-overlay {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.estado-visibilidad {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.estado-visibilidad.visible {
+  color: #2e7d32;
+}
+
+.estado-visibilidad.oculto {
+  color: #d32f2f;
+}
+
+.producto-controles {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.controles-superiores {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.controles-inferiores {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.controles-reordenar {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-mover {
+  background: var(--tabla-texto);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.btn-mover:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.btn-mover:not(:disabled):hover {
+  background: var(--tabla-naranja);
+}
+
+.producto-categoria {
+  font-size: 0.85rem;
+  color: rgba(93, 64, 55, 0.7);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+/* Mejoras responsive */
+@media (max-width: 900px) {
+  .controles-inferiores {
+    flex-direction: column;
+    gap: 6px;
+  }
+  
+  .controles-reordenar {
+    align-self: center;
+  }
+}

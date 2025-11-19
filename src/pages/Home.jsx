@@ -54,6 +54,14 @@ export default function Home() {
                 Gestión de Usuario
               </NavLink>
             )}
+            {currentUser?.role === 'admin' && (
+              <NavLink
+                to="/gestionProductos"
+                className={({ isActive }) => (isActive ? 'btn-primary active' : 'btn-primary')}
+              >
+                Gestión de Productos
+              </NavLink>
+            )}
             {currentUser && (
               <NavLink
                 to="/perfil"

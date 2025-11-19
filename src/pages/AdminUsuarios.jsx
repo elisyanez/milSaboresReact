@@ -3,12 +3,18 @@ import { Link, Navigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
 import { regiones } from '../data/regionesComunas';
 import { validarRunSimple, validarCorreo } from '../utils/user.logic';
+import { getUsuarios, createUsuario, updateUsuario, deleteUsuario } from '../services/usuarioService';
 
-export default function AdminUsuarios(){
+export default function AdminUsuarios({ onEdit }){
+  // antiguo con contexto
   const { users, currentUser, register, updateUser, deleteUser } = useUser();
   const [editing, setEditing] = useState(null); // run
   const [form, setForm] = useState({ run:'', nombre:'', apellidos:'', correo:'', region:'', comuna:'', direccion:'', role:'client', password:'' });
   const [errors, setErrors] = useState({});
+  //nuevo con api
+  const [usuarios, setUsuarios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const comunas = useMemo(()=>{
     const r = regiones.find(r=> r.region === form.region); return r? r.comunas : [];

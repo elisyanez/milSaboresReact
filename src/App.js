@@ -11,6 +11,7 @@ import Registro from './pages/Registro';
 import Login from './pages/Login';
 import AdminUsuarios from './pages/AdminUsuarios';
 import Perfil from './pages/Perfil';
+import GestionProductos from './pages/GestionProductos';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/usuario" element={<AdminUsuarios />} />
         <Route path="/perfil" element={<Perfil />} />
+        <Route path="/gestionProductos" element={<GestionProductos />} />
         <Route path="*" element={<h1>404 - Página no encontrada</h1>} />
       </Routes>
     </>
