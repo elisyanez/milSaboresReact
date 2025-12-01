@@ -33,8 +33,8 @@ export default function Nosotros() {
           <div className="about-gallery" aria-hidden>
             <img src="/IMG/torta-chocolate.jpg" alt="Torta de chocolate" className="about-thumb" />
             <img src="/IMG/torta-frutas.jpg" alt="Torta de frutas" className="about-thumb" />
-            <img src="/IMG/mousse-chocolate.png" alt="Mousse de chocolate" className="about-thumb"/> 
-            <img src="/IMG/tiramisu.png" alt="Tiramisú" className="about-thumb" style={{width: '200px'}} />
+            <img src="/IMG/mousse-chocolate.png" alt="Mousse de chocolate" className="about-thumb" />
+            <img src="/IMG/tiramisu.png" alt="Tiramisú" className="about-thumb" />
           </div>
         </div>
       </section>
