@@ -19,7 +19,7 @@ export default function ConfirmacionCompra(){
   const direccionCompleta = `${currentUser.direccion || ''}, ${currentUser.comuna || ''}, ${currentUser.region || ''}`.replace(/^,\s*/, '').replace(/\s+,\s+$/, '');
 
   const confirmar = async () => {
-    if (!window.confirm('?Confirmar y generar boleta?')) return;
+    if (!window.confirm('Confirmar compra y generar boleta?')) return;
     setSubmitting(true);
     setError('');
     try {
@@ -52,7 +52,7 @@ export default function ConfirmacionCompra(){
       <div className="form-card">
         <h3 style={{marginTop:0}}>Resumen</h3>
         <div style={{marginBottom:8}}>Cliente: <strong>{currentUser.nombre}</strong> (RUN: {currentUser.run})</div>
-        <div style={{marginBottom:8}}>Direcci?n de despacho: <strong>{direccionCompleta || 'N/D'}</strong></div>
+        <div style={{marginBottom:8}}>Direccion de despacho: <strong>{direccionCompleta || 'N/D'}</strong></div>
         <table className="user-table" style={{marginTop:10}}>
           <thead><tr><th>Producto</th><th>Cantidad</th><th>Precio</th><th>Subtotal</th></tr></thead>
           <tbody>
