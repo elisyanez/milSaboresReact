@@ -4,15 +4,15 @@ import { useUser } from '../context/UserContext';
 
 export default function Login() {
   const { login } = useUser();
-  const [id, setId] = useState('');
+  const [correo, setCorreo] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      login(id, password);
+      await login(correo, password);
       navigate('/');
     } catch (err) {
       setError(err.message || 'Error al iniciar sesion');
@@ -25,8 +25,8 @@ export default function Login() {
       <form onSubmit={onSubmit} className="form-card login-form">
         {error && <div className="form-error">{error}</div>}
         <label>
-          RUN o Correo
-          <input value={id} onChange={(e)=> setId(e.target.value)} placeholder="19011022K o usuario@duoc.cl" />
+          Correo
+          <input value={correo} onChange={(e)=> setCorreo(e.target.value)} placeholder="usuario@duoc.cl" type="email" />
         </label>
         <label>
           Contrasena
