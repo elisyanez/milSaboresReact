@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useMemo, useEffect } from '
 import { useUser } from './UserContext';
 import { parseCLP } from '../utils/money.logic';
 import { groupItems, updateQuantityInList, removeQuantityInList, countItems } from '../utils/cart.logic';
-import { readCart, writeCart } from '../data/db';
+
 
 const CartContext = createContext(null);
 
@@ -10,15 +10,10 @@ export function CartProvider({ children }) {
   const [items, setItems] = useState([]);
   const { currentUser } = useUser();
 
-  // Load cart when user changes
+  // Si cambia el usuario autenticado, reseteamos el carrito local
   useEffect(() => {
-    setItems(readCart(currentUser?.run));
-  }, [currentUser]);
-
-  // Persist cart per-user
-  useEffect(() => {
-    writeCart(currentUser?.run, items);
-  }, [items, currentUser]);
+    setItems([]);
+  }, [currentUser?.run]);
 
   const addItem = (item) => {
     setItems((prev) => [...prev, item]);

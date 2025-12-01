@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useCart } from '../context/CartContext';
-import { productos as productosDB, descripciones as descripcionesDB, readProducts } from '../data/db';
 import { sanitizeCantidad, buildDescripcion } from '../utils/catalogo.logic';
 import { parseCLP, formatCLP } from '../utils/money.logic';
+import { getProductos } from '../services/productoService';
 
-const descripciones = descripcionesDB;
+const descripciones = {};
 
 // Fallback image (SVG) for missing product images
 const PLACEHOLDER_IMG = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="220"><rect width="100%25" height="100%25" fill="%23FFF5E1"/><text x="50%25" y="44%25" dominant-baseline="middle" text-anchor="middle" fill="%235D4037" font-size="16" font-family="Lato, Arial">Imagen no disponible</text><text x="50%25" y="60%25" dominant-baseline="middle" text-anchor="middle" fill="%23E58A2E" font-size="14" font-family="Lato, Arial">Dulce por venir</text></svg>';
 
-const productos = (typeof window !== 'undefined' ? readProducts() : productosDB).filter(p => p.visible !== false);
-
 export default function Catalogo() {
   const { addItem } = useCart();
+  const [productos, setProductos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [seleccionado, setSeleccionado] = useState(null);
   const [cantidad, setCantidad] = useState(1);
   const [filtroTorta, setFiltroTorta] = useState('todas'); // 'todas' | 'cuadrada' | 'circular'
@@ -21,12 +22,32 @@ export default function Catalogo() {
   const MAX_MSG = 60;
   const EXTRA_PERSONALIZACION = 3000; // CLP
 
-  const lista = productos.filter((p) => {
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const data = await getProductos();
+        const visibles = Array.isArray(data) ? data.filter(p => p.visible !== false).map(p => ({
+          ...p,
+          precio: formatCLP(Number(p.precio) || parseCLP(p.precio || 0))
+        })) : [];
+        setProductos(visibles);
+      } catch (err) {
+        setError(err?.response?.data?.message || err.message || 'Error cargando productos');
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  const lista = useMemo(() => productos.filter((p) => {
     if (filtroTorta === 'todas') return true;
     if (filtroTorta === 'cuadrada') return p.categoria && /Cuadradas/i.test(p.categoria);
     if (filtroTorta === 'circular') return p.categoria && /Circulares/i.test(p.categoria);
     return true;
-  });
+  }), [productos, filtroTorta]);
 
   const abrir = (prod) => {
     setSeleccionado(prod);
@@ -46,7 +67,7 @@ export default function Catalogo() {
       codigo: seleccionado.codigo,
       nombre: seleccionado.nombre,
       precio: precioConExtra,
-      img: seleccionado.img,
+      imagenUrl: seleccionado.imagenUrl,
       cantidad: hasMsg ? 1 : cantidad,
     };
     if (hasMsg) {
@@ -58,7 +79,9 @@ export default function Catalogo() {
   };
   return (
     <main className="page-container">
-  <h2 className="page-title">Catálogo de productos</h2>
+      <h2 className="page-title">Catalogo de productos</h2>
+      {error && <div className="form-error" style={{ marginBottom: 12 }}>{error}</div>}
+      {loading && <p>Cargando productos...</p>}
       <div className="form-card" style={{ maxWidth: 1100 }}>
         <div className="form-actions" style={{ justifyContent: 'center', flexWrap: 'wrap', gap: 8 }}>
           <button type="button" className={`btn ${filtroTorta==='todas'?'btn-primary':'btn-outline-secondary'}`} onClick={()=> setFiltroTorta('todas')}>Todas</button>
@@ -70,8 +93,8 @@ export default function Catalogo() {
         {lista.map((prod) => (
           <div className="producto-card" key={prod.codigo} onClick={() => abrir(prod)} role="button" tabIndex={0} onKeyDown={(e)=> (e.key==='Enter'||e.key===' ') && abrir(prod)}>
             <div className="producto-img-wrap">
-              <img src={prod.img} alt={prod.nombre} className="producto-img" onError={(e)=>{ e.currentTarget.onerror=null; e.currentTarget.src=PLACEHOLDER_IMG; }} />
-              <div className="producto-desc">{buildDescripcion(prod.codigo, prod.categoria, descripciones)}</div>
+              <img src={prod.imagenUrl || prod.img} alt={prod.nombre} className="producto-img" onError={(e)=>{ e.currentTarget.onerror=null; e.currentTarget.src=PLACEHOLDER_IMG; }} />
+              <div className="producto-desc">{prod.descripcion || buildDescripcion(prod.codigo, prod.categoria, descripciones)}</div>
             </div>
             <div className="producto-nombre">{prod.nombre}</div>
             <div className="producto-precio">{prod.precio}</div>
@@ -83,8 +106,8 @@ export default function Catalogo() {
           <div className="modal-card" onClick={(e)=> e.stopPropagation()}>
             <div className="modal-header"><h3>{seleccionado.nombre}</h3></div>
             <div className="modal-body">
-              <img src={seleccionado.img} alt={seleccionado.nombre} className="modal-img" onError={(e)=>{ e.currentTarget.onerror=null; e.currentTarget.src=PLACEHOLDER_IMG; }} />
-              <p className="modal-desc">{buildDescripcion(seleccionado.codigo, seleccionado.categoria, descripciones)}</p>
+              <img src={seleccionado.imagenUrl || seleccionado.img} alt={seleccionado.nombre} className="modal-img" onError={(e)=>{ e.currentTarget.onerror=null; e.currentTarget.src=PLACEHOLDER_IMG; }} />
+              <p className="modal-desc">{seleccionado.descripcion || buildDescripcion(seleccionado.codigo, seleccionado.categoria, descripciones)}</p>
               <div className="modal-precio">{formatCLP(parseCLP(seleccionado.precio) + (mensaje.trim().length>0 ? EXTRA_PERSONALIZACION : 0))}</div>
               <label className="modal-qty" style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 6 }}>
                 Mensaje en la torta (opcional)
@@ -116,4 +139,3 @@ export default function Catalogo() {
     </main>
   );
 }
-

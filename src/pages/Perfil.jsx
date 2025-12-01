@@ -1,11 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
-import { regiones } from '../data/regionesComunas';
+import { useUbicaciones } from '../hooks/useUbicaciones';
 import { validarCorreo as validarCorreoSimple } from '../utils/user.logic';
 
 export default function Perfil() {
   const { currentUser, updateUser } = useUser();
+  const { regiones, getComunasByRegion, loading, error } = useUbicaciones();
   const [form, setForm] = useState(() => ({
     nombre: currentUser?.nombre || '',
     apellidos: currentUser?.apellidos || '',
@@ -17,13 +18,24 @@ export default function Perfil() {
   }));
   const [errors, setErrors] = useState({});
   const [saved, setSaved] = useState(false);
+  const [comunasFiltradas, setComunasFiltradas] = useState([]);
 
-  // Do not early-return before hooks; render conditionally instead
+  useEffect(() => {
+    if (form.region) {
+      const comunas = getComunasByRegion(form.region);
+      setComunasFiltradas(comunas);
+      if (!comunas.some((c) => c.codigo === form.comuna)) {
+        setForm((prev) => ({ ...prev, comuna: '' }));
+      }
+    } else {
+      setComunasFiltradas([]);
+    }
+  }, [form.region, form.comuna, getComunasByRegion]);
 
   const comunas = useMemo(() => {
-    const r = regiones.find((r) => r.region === form.region);
-    return r ? r.comunas : [];
-  }, [form.region]);
+    const r = regiones.find((r) => r.codigo === form.region);
+    return r ? getComunasByRegion(r.codigo) : comunasFiltradas;
+  }, [form.region, regiones, getComunasByRegion, comunasFiltradas]);
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -35,9 +47,9 @@ export default function Perfil() {
     const e = {};
     if (!form.nombre) e.nombre = 'Requerido';
     if (!form.apellidos) e.apellidos = 'Requerido';
-    if (!form.correo || !validarCorreoSimple(form.correo)) e.correo = 'Correo inválido';
+    if (!form.correo || !validarCorreoSimple(form.correo)) e.correo = 'Correo invalido';
     if (!form.direccion) e.direccion = 'Requerido';
-    if (!form.region) e.region = 'Seleccione región';
+    if (!form.region) e.region = 'Seleccione region';
     if (!form.comuna) e.comuna = 'Seleccione comuna';
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -64,6 +76,8 @@ export default function Perfil() {
   ) : (
     <main className="page-container">
       <h2 className="page-title">Mi Perfil</h2>
+      {error && <div className="form-error">{error}</div>}
+      {loading && <p>Cargando ubicaciones...</p>}
       <form className="form-card" onSubmit={save}>
         {saved && <div className="form-success">Datos actualizados</div>}
         <div className="form-grid">
@@ -83,12 +97,12 @@ export default function Perfil() {
             {errors.correo && <span className="field-error">{errors.correo}</span>}
           </label>
           <label>
-            Región
+            Region
             <select name="region" value={form.region} onChange={onChange}>
-              <option value="">Seleccione región</option>
+              <option value="">Seleccione region</option>
               {regiones.map((r) => (
-                <option key={r.region} value={r.region}>
-                  {r.region}
+                <option key={r.codigo} value={r.codigo}>
+                  {r.nombre}
                 </option>
               ))}
             </select>
@@ -99,20 +113,20 @@ export default function Perfil() {
             <select name="comuna" value={form.comuna} onChange={onChange} disabled={!form.region}>
               <option value="">Seleccione comuna</option>
               {comunas.map((c) => (
-                <option key={c} value={c}>
-                  {c}
+                <option key={c.codigo} value={c.codigo}>
+                  {c.nombre}
                 </option>
               ))}
             </select>
             {errors.comuna && <span className="field-error">{errors.comuna}</span>}
           </label>
           <label className="wide">
-            Dirección
+            Direccion
             <input name="direccion" value={form.direccion} onChange={onChange} />
             {errors.direccion && <span className="field-error">{errors.direccion}</span>}
           </label>
           <label>
-            Nueva contraseña (opcional)
+            Nueva contrasena (opcional)
             <input name="password" type="password" value={form.password} onChange={onChange} />
           </label>
         </div>

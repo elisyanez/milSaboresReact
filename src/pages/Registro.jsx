@@ -1,21 +1,54 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
-import { regiones } from '../data/regionesComunas';
+import { useUbicaciones } from '../hooks/useUbicaciones';
 import { validarRun, validarCorreoRegistro as validarCorreo } from '../utils/registro.logic';
 
 export default function Registro() {
   const { register } = useUser();
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    run: '', nombre: '', apellidos: '', correo: '', fechaNacimiento: '', region: '', comuna: '', direccion: '', password: ''
+    run: '',
+    nombre: '',
+    apellidos: '',
+    correo: '',
+    fechaNacimiento: '',
+    region: '',
+    comuna: '',
+    direccion: '',
+    password: ''
   });
   const [errors, setErrors] = useState({});
 
-  const comunas = useMemo(() => {
-    const r = regiones.find(r => r.region === form.region);
-    return r ? r.comunas : [];
-  }, [form.region]);
+  const { regiones, getComunasByRegion, loading, error } = useUbicaciones();
+  const [comunasFiltradas, setComunasFiltradas] = useState([]);
+
+  useEffect(() => {
+    if (form.region) {
+      const comunas = getComunasByRegion(form.region);
+      setComunasFiltradas(comunas);
+
+      // Reset comuna si la región cambia
+      if (!comunas.some(c => c.codigo === form.comuna)) {
+        setForm(prev => ({ ...prev, comuna: '' }));
+      }
+    } else {
+      setComunasFiltradas([]);
+    }
+  }, [form.region, getComunasByRegion]);
+
+  if (loading) {
+    return <div>Cargando ubicaciones...</div>;
+  }
+
+  if (error) {
+    return <div className="error-message">{error}</div>;
+  }
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
 
   const onChange = (e) => {
     const { name, value } = e.target;
@@ -94,9 +127,13 @@ export default function Registro() {
           </label>
           <label>
             Región
-            <select name="region" value={form.region} onChange={onChange}>
+            <select 
+              name="region" 
+              value={form.region} 
+              onChange={onChange}
+            >
               <option value="">Seleccione región</option>
-              {regiones.map(r => <option key={r.region} value={r.region}>{r.region}</option>)}
+              {regiones.map(r => <option key={r.codigo} value={r.codigo}>{r.nombre}</option>)}
             </select>
             {errors.region && <span className="field-error">{errors.region}</span>}
           </label>
@@ -104,7 +141,7 @@ export default function Registro() {
             Comuna
             <select name="comuna" value={form.comuna} onChange={onChange} disabled={!form.region}>
               <option value="">Seleccione comuna</option>
-              {comunas.map(c => <option key={c} value={c}>{c}</option>)}
+              {comunasFiltradas.map(c => <option key={c.codigo} value={c.codigo}>{c.nombre}</option>)}
             </select>
             {errors.comuna && <span className="field-error">{errors.comuna}</span>}
           </label>

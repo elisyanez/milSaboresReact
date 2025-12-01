@@ -1,15 +1,16 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { useUser } from '../context/UserContext';
-import { readProducts, writeProducts } from '../data/db';
+import { getProductos, createProducto, updateProducto, deleteProducto } from '../services/productoService';
+import { formatCLP, parseCLP } from '../utils/money.logic';
 
 // Fallback image (mismo que en Catálogo)
 const PLACEHOLDER_IMG = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="220"><rect width="100%25" height="100%25" fill="%23FFF5E1"/><text x="50%25" y="44%25" dominant-baseline="middle" text-anchor="middle" fill="%235D4037" font-size="16" font-family="Lato, Arial">Imagen no disponible</text><text x="50%25" y="60%25" dominant-baseline="middle" text-anchor="middle" fill="%23E58A2E" font-size="14" font-family="Lato, Arial">Dulce por venir</text></svg>';
 
-// Categorías disponibles basadas en tus productos
+// Categorías disponibles
 const CATEGORIAS = [
   'Tortas Cuadradas',
-  'Tortas Circulares', 
+  'Tortas Circulares',
   'Postres Individuales',
   'Productos Sin Azúcar',
   'Pastelería Tradicional',
@@ -20,65 +21,78 @@ const CATEGORIAS = [
 
 export default function GestionProductos() {
   const { currentUser } = useUser();
-  const [productos, setProductos] = useState(() => readProducts());
-  const [editando, setEditando] = useState(null); // 'NEW' o codigo del producto
+  const [productos, setProductos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [editando, setEditando] = useState(null); // 'NEW' o código
   const [form, setForm] = useState({
     codigo: '',
     categoria: '',
     nombre: '',
     precio: '',
-    img: '',
+    imagenUrl: '',
     visible: true
   });
   const [errors, setErrors] = useState({});
   const [filtroCategoria, setFiltroCategoria] = useState('todas');
 
-  // Filtrar productos por categoría - HOOKS SIEMPRE ARRIBA
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const data = await getProductos();
+        const mapped = Array.isArray(data)
+          ? data.map(p => ({
+              ...p,
+              precio: formatCLP(Number(p.precio) || parseCLP(p.precio || 0)),
+              visible: p.visible !== false
+            }))
+          : [];
+        setProductos(mapped);
+      } catch (err) {
+        setError(err?.response?.data?.message || err.message || 'Error cargando productos');
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  // Filtrar productos por categoría
   const productosFiltrados = useMemo(() => {
     if (filtroCategoria === 'todas') return productos;
     return productos.filter(p => p.categoria === filtroCategoria);
   }, [productos, filtroCategoria]);
 
-  // Verificar permisos de admin - DESPUÉS DE TODOS LOS HOOKS
   if (!currentUser || currentUser.role !== 'admin') {
     return <Navigate to="/login" replace />;
   }
 
-  // Iniciar creación de producto
   const iniciarCreacion = () => {
     setEditando('NEW');
-    setForm({
-      codigo: '',
-      categoria: '',
-      nombre: '',
-      precio: '',
-      img: '',
-      visible: true
-    });
+    setForm({ codigo: '', categoria: '', nombre: '', precio: '', imagenUrl: '', visible: true });
     setErrors({});
   };
 
-  // Iniciar edición de producto
   const iniciarEdicion = (producto) => {
     setEditando(producto.codigo);
     setForm({
       codigo: producto.codigo,
       categoria: producto.categoria,
       nombre: producto.nombre,
-      precio: producto.precio.replace(' CLP', '').replace('$', ''),
-      img: producto.img,
-      visible: producto.visible !== false // Por defecto visible
+      precio: String(Number(producto.precio) || parseCLP(producto.precio || 0)),
+      imagenUrl: producto.imagenUrl,
+      visible: producto.visible !== false
     });
     setErrors({});
   };
 
-  // Cancelar edición
   const cancelar = () => {
     setEditando(null);
     setErrors({});
   };
 
-  // Manejar cambios en el formulario
   const manejarCambio = (e) => {
     const { name, value, type, checked } = e.target;
     setForm(prev => ({
@@ -87,90 +101,78 @@ export default function GestionProductos() {
     }));
   };
 
-  // Validar formulario
   const validarFormulario = () => {
     const nuevosErrores = {};
-
     if (!form.codigo.trim()) {
       nuevosErrores.codigo = 'Código requerido';
     } else if (editando === 'NEW' && productos.find(p => p.codigo === form.codigo)) {
       nuevosErrores.codigo = 'El código ya existe';
     }
-
     if (!form.categoria) nuevosErrores.categoria = 'Categoría requerida';
     if (!form.nombre.trim()) nuevosErrores.nombre = 'Nombre requerido';
-    
     if (!form.precio.trim()) {
       nuevosErrores.precio = 'Precio requerido';
     } else if (!/^\d+$/.test(form.precio.replace(/\./g, ''))) {
       nuevosErrores.precio = 'Precio inválido (solo números, ej: 45000)';
     }
-
-    if (!form.img.trim()) nuevosErrores.img = 'Imagen requerida';
-
+    if (!form.imagenUrl.trim()) nuevosErrores.imagenUrl = 'Imagen requerida';
     setErrors(nuevosErrores);
     return Object.keys(nuevosErrores).length === 0;
   };
 
-  // Guardar producto (crear o actualizar)
-  // Guardar producto (crear o actualizar)
-const guardarProducto = async () => {
-  if (!validarFormulario()) return;
-
-  let rutaImagenFinal = form.img;
-
-  // Si hay una imagen local para subir
-  if (form.archivoImagen) {
+  const guardarProducto = async () => {
+    if (!validarFormulario()) return;
+    const precioNumber = Number(form.precio.replace(/\./g, '')) || 0;
+    const payload = {
+      codigo: form.codigo,
+      categoria: form.categoria,
+      nombre: form.nombre,
+      precio: precioNumber,
+      imagenUrl: form.imagenUrl,
+      visible: form.visible
+    };
     try {
-      // Mostrar loading
-      console.log('Subiendo imagen...');
-      
-      // Subir imagen al servidor
-      rutaImagenFinal = await subirImagenAlServidor(form.archivoImagen);
-      
-      console.log('Imagen subida exitosamente:', rutaImagenFinal);
-    } catch (error) {
-      console.error('Error subiendo imagen:', error);
-      alert('Error al subir la imagen. Intenta nuevamente.');
-      return;
-    }
-  }
-
-  const productoData = {
-    codigo: form.codigo,
-    categoria: form.categoria,
-    nombre: form.nombre,
-    precio: `$${parseInt(form.precio).toLocaleString('es-CL')} CLP`,
-    img: rutaImagenFinal,
-    visible: form.visible
-  };
-
-  if (editando === 'NEW') {
-    setProductos(prev => { const next = [...prev, productoData]; writeProducts(next); return next; });
-  } else {
-    setProductos(prev => prev.map(p => 
-      p.codigo === editando ? productoData : p
-    ));
-  }
-
-  setEditando(null);
-};
-
-  // Eliminar producto
-  const eliminarProducto = (codigo) => {
-    if (window.confirm('¿Estás seguro de eliminar este producto?')) {
-      setProductos(prev => { const next = prev.filter(p => p.codigo !== codigo); writeProducts(next); return next; });
+      let saved;
+      if (editando === 'NEW') {
+        saved = await createProducto(payload);
+      } else {
+        saved = await updateProducto(editando, payload);
+      }
+      const normalizado = {
+        ...saved,
+        precio: formatCLP(Number(saved?.precio) || precioNumber),
+        visible: saved?.visible !== false
+      };
+      setProductos(prev => (editando === 'NEW' ? [...prev, normalizado] : prev.map(p => (p.codigo === editando ? normalizado : p))));
+      setEditando(null);
+    } catch (err) {
+      alert(err?.response?.data?.message || err.message || 'Error guardando producto');
     }
   };
 
-  // Toggle visibilidad
-  const toggleVisibilidad = (codigo) => {
-    setProductos(prev => prev.map(p => 
-      p.codigo === codigo ? { ...p, visible: !p.visible } : p
-    ));
+  const eliminarProducto = async (codigo) => {
+    if (!window.confirm('¿Estás seguro de eliminar este producto?')) return;
+    try {
+      await deleteProducto(codigo);
+      setProductos(prev => prev.filter(p => p.codigo !== codigo));
+    } catch (err) {
+      alert(err?.response?.data?.message || err.message || 'Error al eliminar');
+    }
   };
 
-  // Reordenar productos (mover arriba)
+  const toggleVisibilidad = async (codigo) => {
+    const prod = productos.find(p => p.codigo === codigo);
+    if (!prod) return;
+    try {
+      const updated = await updateProducto(codigo, { ...prod, visible: !prod.visible, precio: Number(prod.precio) || parseCLP(prod.precio || 0) });
+      setProductos(prev => prev.map(p =>
+        p.codigo === codigo ? { ...p, ...updated, precio: formatCLP(Number(updated?.precio) || parseCLP(updated?.precio || 0)), visible: updated?.visible !== false } : p
+      ));
+    } catch (err) {
+      alert(err?.response?.data?.message || err.message || 'No se pudo actualizar visibilidad');
+    }
+  };
+
   const moverArriba = (index) => {
     if (index === 0) return;
     setProductos(prev => {
@@ -180,7 +182,6 @@ const guardarProducto = async () => {
     });
   };
 
-  // Reordenar productos (mover abajo)
   const moverAbajo = (index) => {
     if (index === productosFiltrados.length - 1) return;
     setProductos(prev => {
@@ -190,95 +191,56 @@ const guardarProducto = async () => {
     });
   };
 
-  // Generar código automático para nuevo producto
   const generarCodigoAutomatico = () => {
     const categoriasCodigos = {
-        'Tortas Cuadradas': 'TC',
-        'Tortas Circulares': 'TT',
-        'Postres Individuales': 'PI',
-        'Productos Sin Azúcar': 'PSA',
-        'Pastelería Tradicional': 'PT',
-        'Productos Sin Gluten': 'PG',
-        'Productos Veganos': 'PV',
-        'Tortas Especiales': 'TE'
+      'Tortas Cuadradas': 'TC',
+      'Tortas Circulares': 'TT',
+      'Postres Individuales': 'PI',
+      'Productos Sin Azúcar': 'PSA',
+      'Pastelería Tradicional': 'PT',
+      'Productos Sin Gluten': 'PG',
+      'Productos Veganos': 'PV',
+      'Tortas Especiales': 'TE'
     };
-
     const prefijo = categoriasCodigos[form.categoria] || 'PR';
-
-    // Encontrar el siguiente número disponible en esta categoría
-    const productosCategoria = productos.filter(p => 
-        p.codigo.startsWith(prefijo)
-    );
-    
+    const productosCategoria = productos.filter(p => p.codigo.startsWith(prefijo));
     let numero = 1;
     while (productosCategoria.find(p => p.codigo === `${prefijo}${numero.toString().padStart(3, '0')}`)) {
-        numero++;
+      numero++;
     }
-    const nuevoCodigo = `${prefijo}${numero.toString().padStart(3, '0')}`;
-    setForm(prev => ({ ...prev, codigo: nuevoCodigo }));
-    };
+    setForm(prev => ({ ...prev, codigo: `${prefijo}${numero.toString().padStart(3, '0')}` }));
+  };
 
-// Función para manejar subida de imagen local
-const manejarSubidaImagen = (e) => {
-  const archivo = e.target.files[0];
-  if (archivo) {
-    // Validar tipo de archivo
-    if (!archivo.type.startsWith('image/')) {
-      alert('Por favor selecciona solo archivos de imagen');
-      return;
-    }
-
-    // Validar tamaño (max 2MB)
-    if (archivo.size > 2 * 1024 * 1024) {
-      alert('La imagen debe ser menor a 2MB');
-      return;
-    }
-
-    // Crear URL local para vista previa inmediata
-    const urlLocal = URL.createObjectURL(archivo);
-    setForm(prev => ({ 
-      ...prev, 
-      img: urlLocal,
-      archivoImagen: archivo // Guardamos el archivo para luego subirlo
-    }));
-  }
-};
-
-// Función para subir imagen al servidor (simulada por ahora)
-const subirImagenAlServidor = async (archivo) => {
-  // En un entorno real, aquí harías una petición a tu backend
-  // Por ahora simulamos la subida copiando a public/IMG/
-  
-  return new Promise((resolve, reject) => {
-    // Simulamos un delay de subida
-    setTimeout(() => {
-      try {
-        // Generar nombre único para la imagen
-        const extension = archivo.name.split('.').pop();
-        const nombreUnico = `producto_${Date.now()}.${extension}`;
-        const rutaServidor = `/IMG/${nombreUnico}`;
-        
-        // En un entorno real, aquí subirías el archivo
-        console.log('Subiendo imagen:', archivo.name, '→', rutaServidor);
-        
-        // Por ahora, solo retornamos la ruta que debería tener
-        resolve(rutaServidor);
-      } catch (error) {
-        reject(error);
+  const manejarSubidaImagen = (e) => {
+    const archivo = e.target.files[0];
+    if (archivo) {
+      if (!archivo.type.startsWith('image/')) {
+        alert('Por favor selecciona solo archivos de imagen');
+        return;
       }
-    }, 1000);
-  });
-};
+      if (archivo.size > 2 * 1024 * 1024) {
+        alert('La imagen debe ser menor a 2MB');
+        return;
+      }
+      const urlLocal = URL.createObjectURL(archivo);
+      setForm(prev => ({
+        ...prev,
+        imagenUrl: urlLocal,
+        archivoImagen: archivo
+      }));
+    }
+  };
 
   return (
     <main className="page-container">
       <h2 className="page-title">Gestión de Productos</h2>
+      {error && <div className="form-error" style={{ marginBottom: 12 }}>{error}</div>}
+      {loading && <p>Cargando productos...</p>}
 
-      {/* Filtros */}
       <div className="form-card" style={{ maxWidth: 1100 }}>
         <div className="form-actions" style={{ justifyContent: 'center', flexWrap: 'wrap', gap: 8 }}>
-          <button 
-            type="button" 
+          <button
+            type="button"
             className={`btn ${filtroCategoria === 'todas' ? 'btn-primary' : 'btn-outline-secondary'}`}
             onClick={() => setFiltroCategoria('todas')}
           >
@@ -297,56 +259,54 @@ const subirImagenAlServidor = async (archivo) => {
         </div>
       </div>
 
-      {/* Grid de productos - estilo similar a Catálogo pero con controles admin */}
       <div className="productos-grid">
         {productosFiltrados.map((prod, index) => (
-          <div 
-            className={`producto-card ${!prod.visible ? 'producto-oculto' : ''}`} 
+          <div
+            className={`producto-card ${!prod.visible ? 'producto-oculto' : ''}`}
             key={prod.codigo}
           >
             <div className="producto-img-wrap">
-              <img 
-                src={prod.img} 
-                alt={prod.nombre} 
-                className="producto-img" 
+              <img
+                src={prod.imagenUrl || PLACEHOLDER_IMG}
+                alt={prod.nombre}
+                className="producto-img"
                 onError={(e) => {
-                  e.currentTarget.onerror = null; 
+                  e.currentTarget.onerror = null;
                   e.currentTarget.src = PLACEHOLDER_IMG;
-                }} 
+                }}
               />
               <div className="producto-admin-overlay">
                 <span className={`estado-visibilidad ${prod.visible ? 'visible' : 'oculto'}`}>
-                  {prod.visible ? '🟢 Visible' : '🔴 Oculto'}
+                  {prod.visible ? '✅ Visible' : '🚫 Oculto'}
                 </span>
               </div>
             </div>
-            
+
             <div className="producto-nombre">{prod.nombre}</div>
             <div className="producto-precio">{prod.precio}</div>
             <div className="producto-categoria">{prod.categoria}</div>
-            
-            {/* Controles de administración */}
+
             <div className="producto-controles">
               <div className="controles-superiores">
-                <button 
+                <button
                   className="btn btn-secondary btn-xs"
                   onClick={() => iniciarEdicion(prod)}
                 >
                   Editar
                 </button>
-                <button 
+                <button
                   className="btn btn-outline-danger btn-xs"
                   onClick={() => eliminarProducto(prod.codigo)}
                 >
                   Eliminar
                 </button>
               </div>
-              
+
               <div className="controles-inferiores">
-                <button 
+                <button
                   className="btn btn-xs"
                   onClick={() => toggleVisibilidad(prod.codigo)}
-                  style={{ 
+                  style={{
                     background: prod.visible ? '#e58a2e' : '#7eb6e6',
                     color: 'white',
                     border: 'none'
@@ -354,16 +314,16 @@ const subirImagenAlServidor = async (archivo) => {
                 >
                   {prod.visible ? 'Ocultar' : 'Mostrar'}
                 </button>
-                
+
                 <div className="controles-reordenar">
-                  <button 
+                  <button
                     className="btn-mover"
                     onClick={() => moverArriba(index)}
                     disabled={index === 0}
                   >
                     ↑
                   </button>
-                  <button 
+                  <button
                     className="btn-mover"
                     onClick={() => moverAbajo(index)}
                     disabled={index === productosFiltrados.length - 1}
@@ -377,49 +337,48 @@ const subirImagenAlServidor = async (archivo) => {
         ))}
       </div>
 
-      {/* Formulario de edición/creación */}
       {editando && (
         <div className="form-card" style={{ marginTop: 20, maxWidth: 600 }}>
           <h3 style={{ marginTop: 0, color: 'var(--tabla-texto)' }}>
             {editando === 'NEW' ? 'Crear Nuevo Producto' : `Editar Producto: ${form.codigo}`}
           </h3>
-          
+
           <div className="form-grid">
             <label>
               Código del Producto
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <input
-                type="text"
-                name="codigo"
-                value={form.codigo}
-                onChange={manejarCambio}
-                disabled={editando !== 'NEW'}
-                className="input-pastel"
-                placeholder="Ej: TC003, PI003"
-                style={{ flex: 1 }}
-              />
-              {editando === 'NEW' && (
-                <button 
+                <input
+                  type="text"
+                  name="codigo"
+                  value={form.codigo}
+                  onChange={manejarCambio}
+                  disabled={editando !== 'NEW'}
+                  className="input-pastel"
+                  placeholder="Ej: TC003, PI003"
+                  style={{ flex: 1 }}
+                />
+                {editando === 'NEW' && (
+                  <button
                     type="button"
                     className="btn btn-secondary btn-xs"
                     onClick={generarCodigoAutomatico}
                     style={{ whiteSpace: 'nowrap' }}
-                >
+                  >
                     Auto
-                </button>
+                  </button>
                 )}
               </div>
               <small style={{ color: '#666', fontSize: '12px' }}>
-                    Ejemplo: TC001 (Tortas Cuadradas), PI001 (Postres Individuales)
+                Ejemplo: TC001 (Tortas Cuadradas), PI001 (Postres Individuales)
               </small>
               {errors.codigo && <span className="field-error">{errors.codigo}</span>}
             </label>
 
             <label>
               Categoría
-              <select 
-                name="categoria" 
-                value={form.categoria} 
+              <select
+                name="categoria"
+                value={form.categoria}
                 onChange={manejarCambio}
                 className="input-pastel"
               >
@@ -457,28 +416,28 @@ const subirImagenAlServidor = async (archivo) => {
             </label>
 
             <label className="wide">
-                Imagen del Producto
-                <div style={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
-                    <input
-                    type="text"
-                    name="img"
-                    value={form.img}
-                    onChange={manejarCambio}
-                    placeholder="URL de la imagen: /IMG/torta-ejemplo.jpg"
-                    className="input-pastel"
-                    />
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <span style={{ fontSize: '14px', color: '#666' }}>O</span>
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={manejarSubidaImagen}
-                        style={{ flex: 1 }}
-                    />
-                    </div>
+              Imagen del Producto
+              <div style={{ display: 'flex', gap: '8px', flexDirection: 'column' }}>
+                <input
+                  type="text"
+                  name="imagenUrl"
+                  value={form.imagenUrl}
+                  onChange={manejarCambio}
+                  placeholder="URL de la imagen: /IMG/torta-ejemplo.jpg"
+                  className="input-pastel"
+                />
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <span style={{ fontSize: '14px', color: '#666' }}>O</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={manejarSubidaImagen}
+                    style={{ flex: 1 }}
+                  />
                 </div>
-                {errors.img && <span className="field-error">{errors.img}</span>}
-                </label>
+              </div>
+              {errors.imagenUrl && <span className="field-error">{errors.imagenUrl}</span>}
+            </label>
 
             <label style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', gap: 10 }}>
               <input
@@ -491,16 +450,15 @@ const subirImagenAlServidor = async (archivo) => {
             </label>
           </div>
 
-          {/* Vista previa de la imagen */}
-          {form.img && (
+          {form.imagenUrl && (
             <div style={{ marginTop: 16, textAlign: 'center' }}>
               <p style={{ marginBottom: 8, color: 'var(--tabla-texto)' }}>Vista previa:</p>
-              <img 
-                src={form.img} 
-                alt="Vista previa" 
-                style={{ 
-                  maxWidth: 200, 
-                  maxHeight: 150, 
+              <img
+                src={form.imagenUrl}
+                alt="Vista previa"
+                style={{
+                  maxWidth: 200,
+                  maxHeight: 150,
                   borderRadius: 8,
                   border: '2px solid var(--tabla-naranja)'
                 }}
@@ -523,7 +481,6 @@ const subirImagenAlServidor = async (archivo) => {
         </div>
       )}
 
-      {/* Botones de acción principales */}
       <div className="form-actions" style={{ marginTop: 20, justifyContent: 'center', gap: 12 }}>
         <button className="btn btn-primary" onClick={iniciarCreacion}>
           + Nuevo Producto
@@ -535,6 +492,4 @@ const subirImagenAlServidor = async (archivo) => {
     </main>
   );
 }
-
-
 
